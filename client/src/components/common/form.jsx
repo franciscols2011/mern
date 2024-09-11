@@ -115,7 +115,7 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
           </div>
         ))}
       </div>
-      <Button type="submit" className="mt-2 w-full bg-blue-800 text-white">
+      <Button type="submit" className="mt-2 w-full  text-white">
         {buttonText || "Submit"}
       </Button>
     </form>
