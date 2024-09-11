@@ -51,7 +51,7 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
             }
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={getControlItem.placeholder} />
+              <SelectValue placeholder={getControlItem.label} />
             </SelectTrigger>
             <SelectContent>
               {getControlItem.options && getControlItem.options.length > 0
