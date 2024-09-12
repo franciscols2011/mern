@@ -6,6 +6,8 @@ import { SheetHeader } from "/components/ui/sheet";
 import { SheetTitle } from "/components/ui/sheet";
 import CommonForm from "/src/components/common/form";
 import { addProductFormElements } from "/src/config";
+import ProductImageUpload from "/src/components/admin-view/image-upload";
+
 
 
 const initialFormData = {
@@ -25,9 +27,17 @@ function AdminProducts() {
 
     const [formData, setFormData] = useState(initialFormData);
 
+    const [imageFile, setImageFile] = useState(null);
+
+    const [uploadedImageUrl, setUploadedImageUrl]= useState('');
+
+    const [imageLoadingState, setImageLoadingState] = useState(false);
+
     function onSubmit(){
 
     }
+
+    console.log("data", formData)
 
     return <Fragment>
         <div className="mb-5 w-full flex justify-end">
@@ -40,8 +50,10 @@ function AdminProducts() {
             }>
                 <SheetContent side="right" className="overflow-auto">
                     <SheetHeader>
-                        <SheetTitle>Create New Product</SheetTitle>
+                        <SheetTitle className="text-lg font-bold text-foreground">Create New Product</SheetTitle>
                     </SheetHeader>
+                    <ProductImageUpload imageFile={imageFile} setImageFile={setImageFile} uploadedImageUrl={uploadedImageUrl} setUploadedImageUrl={setUploadedImageUrl} setImageLoadingState = {setImageLoadingState}
+                    />
                     <div className="py-6">
                         <CommonForm
                         onsubmit={onSubmit}
