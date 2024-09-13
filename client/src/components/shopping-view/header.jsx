@@ -1,11 +1,25 @@
-import { SheetTrigger } from "/components/ui/sheet";
-import { Sheet } from "/components/ui/sheet";
-import { LayoutGrid, Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Sheet, SheetTrigger, SheetContent } from "/components/ui/sheet";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuItem,
+} from "/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "/components/ui/avatar";
+import {
+	LayoutGrid,
+	LogOut,
+	Menu,
+	ShoppingBasket,
+	UserRoundCog,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { SheetContent } from "/components/ui/sheet";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { shoppingViewHeaderMenuItems } from "/src/config";
+import { logoutUser } from "/src/store/auth-slice";
 
 function MenuItems() {
 	return (
@@ -20,6 +34,47 @@ function MenuItems() {
 				</Link>
 			))}
 		</nav>
+	);
+}
+
+function HeaderRightContent() {
+	const { user } = useSelector((state) => state.auth);
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	function handleLogout() {
+		dispatch(logoutUser());
+	}
+
+	return (
+		<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+			<Button variant="outline" size="icon">
+				<ShoppingBasket className="w-6 h-6" />
+				<span className="sr-only">Cart</span>
+			</Button>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Avatar className="bg-black">
+						<AvatarFallback className="bg-black text-white font-extrabold">
+							{user?.userName[0].toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent side="right" className="w-56">
+					<DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={() => navigate("/shop/account")}>
+						<UserRoundCog className="mr-2 h-4 w-4" />
+						Account
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={handleLogout}>
+						<LogOut className="mr-2 h-4 w-4" />
+						Logout
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 }
 
@@ -42,12 +97,16 @@ function ShoppingHeader() {
 					</SheetTrigger>
 					<SheetContent side="left" className="w-full max-w-xs">
 						<MenuItems />
+						<HeaderRightContent />
 					</SheetContent>
 				</Sheet>
 				<div className="hidden lg:block">
 					<MenuItems />
 				</div>
-				{isAuthenticated ? <div></div> : null}
+
+				<div className="hidden lg:block">
+					<HeaderRightContent />
+				</div>
 			</div>
 		</header>
 	);
