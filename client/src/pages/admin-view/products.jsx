@@ -80,6 +80,12 @@ function AdminProducts() {
 			  });
 	}
 
+	function isFormValid() {
+		return Object.keys(formData)
+			.map((key) => formData[key] !== "")
+			.every((item) => item === true);
+	}
+
 	useEffect(() => {
 		dispatch(fetchAllProducts());
 	}, [dispatch]);
@@ -137,6 +143,7 @@ function AdminProducts() {
 							setFormData={setFormData}
 							buttonText={currentEditedId !== null ? "Edit" : "Add"}
 							formControls={addProductFormElements}
+							isBtnDisabled={!isFormValid()}
 						/>
 					</div>
 				</SheetContent>
