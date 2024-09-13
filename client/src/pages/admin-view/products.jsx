@@ -18,6 +18,7 @@ import { useToast } from "/src/hooks/use-toast";
 import AdminProductTile from "/src/components/admin-view/product-tile";
 
 import { editProduct } from "/src/store/admin/products-slice";
+import { deleteProduct } from "/src/store/admin/products-slice";
 
 const initialFormData = {
 	image: null,
@@ -53,8 +54,6 @@ function AdminProducts() {
 						formData,
 					})
 			  ).then((data) => {
-					console.log(data, "edit");
-
 					if (data?.payload?.success) {
 						dispatch(fetchAllProducts());
 						setFormData(initialFormData);
@@ -78,6 +77,15 @@ function AdminProducts() {
 						});
 					}
 			  });
+	}
+
+	function handleDelete(getCurrentProductId) {
+		console.log(getCurrentProductId);
+		dispatch(deleteProduct(getCurrentProductId)).then((data) => {
+			if (data?.payload?.success) {
+				dispatch(fetchAllProducts());
+			}
+		});
 	}
 
 	function isFormValid() {
@@ -108,6 +116,7 @@ function AdminProducts() {
 									setOpenCreateProductsDialog={setOpenCreateProductsDialog}
 									setCurrentEditedId={setCurrentEditedId}
 									product={productItem}
+									handleDelete={handleDelete}
 								/>
 							))
 							.reverse()
