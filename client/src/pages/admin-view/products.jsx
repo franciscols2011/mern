@@ -17,6 +17,8 @@ import {
 import { useToast } from "/src/hooks/use-toast";
 import AdminProductTile from "/src/components/admin-view/product-tile";
 
+import { editProduct } from "/src/store/admin/products-slice";
+
 const initialFormData = {
 	image: null,
 	title: "",
@@ -43,22 +45,39 @@ function AdminProducts() {
 
 	function onSubmit(event) {
 		event.preventDefault();
-		dispatch(
-			addNewProduct({
-				...formData,
-				image: uploadedImageUrl,
-			})
-		).then((data) => {
-			if (data?.payload?.success) {
-				dispatch(fetchAllProducts());
-				setOpenCreateProductsDialog(false);
-				setImageFile(null);
-				setFormData(initialFormData);
-				toast({
-					title: "Product created successfully",
-				});
-			}
-		});
+
+		currentEditedId !== null
+			? dispatch(
+					editProduct({
+						id: currentEditedId,
+						formData,
+					})
+			  ).then((data) => {
+					console.log(data, "edit");
+
+					if (data?.payload?.success) {
+						dispatch(fetchAllProducts());
+						setFormData(initialFormData);
+						setOpenCreateProductsDialog(false);
+						setCurrentEditedId(null);
+					}
+			  })
+			: dispatch(
+					addNewProduct({
+						...formData,
+						image: uploadedImageUrl,
+					})
+			  ).then((data) => {
+					if (data?.payload?.success) {
+						dispatch(fetchAllProducts());
+						setOpenCreateProductsDialog(false);
+						setImageFile(null);
+						setFormData(initialFormData);
+						toast({
+							title: "Product created successfully",
+						});
+					}
+			  });
 	}
 
 	useEffect(() => {
