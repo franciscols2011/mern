@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { fetchAllFilteredProducts } from "/src/store/shop/products-slice";
 import ShoppingProductTile from "/src/components/shopping-view/product-tile";
 import { createSearchParams, useSearchParams } from "react-router-dom";
+import { fetchProductDetails } from "/src/store/shop/products-slice";
+import ProductDetailsDialog from "/src/components/shopping-view/product-details";
 
 function createSearchParamsHelper(filterParams) {
 	const queryParams = [];
@@ -30,10 +32,13 @@ function createSearchParamsHelper(filterParams) {
 function ShoppingListing() {
 	const dispatch = useDispatch();
 
-	const { productList } = useSelector((state) => state.shopProducts);
+	const { productList, productDetails } = useSelector(
+		(state) => state.shopProducts
+	);
 	const [filters, setFilters] = useState({});
 	const [sort, setSort] = useState(null);
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	function handleSort(value) {
 		setSort(value);
 	}
@@ -61,6 +66,11 @@ function ShoppingListing() {
 		sessionStorage.setItem("filters", JSON.stringify(copyFilters));
 	}
 
+	function handleGetProductDetails(getCurrentProductId) {
+		console.log(getCurrentProductId);
+		dispatch(fetchProductDetails(getCurrentProductId));
+	}
+
 	useEffect(() => {
 		setSort("price-lowtohigh");
 		setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
@@ -80,8 +90,11 @@ function ShoppingListing() {
 			);
 	}, [dispatch, sort, filters]);
 
-	console.log(productList);
-	console.log(filters, "filters");
+	useEffect(() => {
+		if (productDetails !== null) setOpenDetailsDialog(true);
+	}, [productDetails]);
+
+	console.log(productDetails, "ProductDetails");
 
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
@@ -122,11 +135,19 @@ function ShoppingListing() {
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
 					{productList && productList.length > 0
 						? productList.map((productItem) => (
-								<ShoppingProductTile product={productItem} />
+								<ShoppingProductTile
+									handleGetProductDetails={handleGetProductDetails}
+									product={productItem}
+								/>
 						  ))
 						: null}
 				</div>
 			</div>
+			<ProductDetailsDialog
+				open={openDetailsDialog}
+				setOpen={setOpenDetailsDialog}
+				productDetails={productDetails}
+			/>
 		</div>
 	);
 }
