@@ -20,75 +20,75 @@ import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "/components/ui/skeleton";
 
-
-
 function App() {
-  const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+	const { user, isAuthenticated, isLoading } = useSelector(
+		(state) => state.auth
+	);
+	const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch])
+	useEffect(() => {
+		dispatch(checkAuth());
+	}, [dispatch]);
 
-  if(isLoading) return <Skeleton className="w-[800] bg-black h-[700px]" />
+	if (isLoading) return <Skeleton className="w-[800] bg-black h-[700px]" />;
 
-  console.log(user, isLoading)
+	console.log(user, isLoading);
 
-  return (
-    <div className="flex flex-col overflow-hidden bg-white">
-      <Routes>
-      <Route
-          path="/"
-          element={
-            <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
-            ></CheckAuth>
-          }
-        />
-        <Route
-          path="/auth"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="login" element={<AuthLogin />} />
-          <Route path="register" element={<AuthRegister />} />
-        </Route>
-        <Route
-          path="/admin"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AdminLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="features" element={<AdminFeatures />} />
-        </Route>
-        <Route
-          path="/shop"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <ShoppingLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="home" element={<ShoppingHome />} />
-          <Route path="listing" element={<ShoppingListing />} />
-          <Route path="checkout" element={<ShoppingCheckout />} />
-          <Route path="account" element={<ShoppingAccount />} />
-        </Route>
+	return (
+		<div className="flex flex-col overflow-hidden bg-white">
+			<Routes>
+				<Route
+					path="/"
+					element={
+						<CheckAuth
+							isAuthenticated={isAuthenticated}
+							user={user}
+						></CheckAuth>
+					}
+				/>
+				<Route
+					path="/auth"
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<AuthLayout />
+						</CheckAuth>
+					}
+				>
+					<Route path="login" element={<AuthLogin />} />
+					<Route path="register" element={<AuthRegister />} />
+				</Route>
+				<Route
+					path="/admin"
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<AdminLayout />
+						</CheckAuth>
+					}
+				>
+					<Route path="dashboard" element={<AdminDashboard />} />
+					<Route path="products" element={<AdminProducts />} />
+					<Route path="orders" element={<AdminOrders />} />
+					<Route path="features" element={<AdminFeatures />} />
+				</Route>
+				<Route
+					path="/shop"
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<ShoppingLayout />
+						</CheckAuth>
+					}
+				>
+					<Route path="home" element={<ShoppingHome />} />
+					<Route path="listing" element={<ShoppingListing />} />
+					<Route path="checkout" element={<ShoppingCheckout />} />
+					<Route path="account" element={<ShoppingAccount />} />
+				</Route>
 
-        <Route path="*" element={<NotFound />} />
-        <Route path="/unauth-page" element={<UnauthPage />} />
-      </Routes>
-    </div>
-  );
+				<Route path="*" element={<NotFound />} />
+				<Route path="/unauth-page" element={<UnauthPage />} />
+			</Routes>
+		</div>
+	);
 }
 
 export default App;

@@ -1,18 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
+const ProductSchema = new mongoose.Schema(
+	{
+		image: String,
+		title: String,
+		description: String,
+		category: String,
+		brand: String,
+		price: Number,
+		salePrice: Number,
+		totalStock: Number,
+	},
+	{ timestamps: true }
+);
 
-
-const ProductSchema = new mongoose.Schema({
-    image: 'String',
-    title: 'String',
-    description: 'String',
-    category: 'String',
-    brand: 'String',
-    price: 'Number',
-    salePrice: 'Number',
-    totalStock: 'Number'
-},
-{timestamps : true})
-
-
-module.exports = mongoose.model('Product', ProductSchema)
+// Check if the model already exists before defining it
+module.exports =
+	mongoose.models.Product || mongoose.model("Product", ProductSchema);
