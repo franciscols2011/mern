@@ -5,6 +5,7 @@ import { Dialog } from "/components/ui/dialog";
 import { Avatar } from "/components/ui/avatar";
 import { AvatarFallback } from "/components/ui/avatar";
 import { StarIcon } from "lucide-react";
+import { Input } from "../ui/input";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
 	return (
@@ -19,7 +20,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 						className="aspect-square w-full object-cover"
 					/>
 				</div>
-				<div className="">
+				<div className="grid gap-4">
 					<div>
 						<h1 className="text-3xl font-extrabold">{productDetails?.title}</h1>
 						<p className="text-muted-foreground text-2xl mb-5 mt-4">
@@ -77,6 +78,50 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 									</p>
 								</div>
 							</div>
+							<div className="flex gap-4">
+								<Avatar className="w-10 h-10 border">
+									<AvatarFallback>SM</AvatarFallback>
+								</Avatar>
+								<div className="grid gap-1">
+									<div className="flex items-center gap-2">
+										<h3 className="font-bold">John Doe</h3>
+									</div>
+									<div className="flex items-center gap-0.5">
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+									</div>
+									<p className="text-muted-foreground">
+										Es un producto muy bueno!!!
+									</p>
+								</div>
+							</div>
+							<div className="flex gap-4">
+								<Avatar className="w-10 h-10 border">
+									<AvatarFallback>SM</AvatarFallback>
+								</Avatar>
+								<div className="grid gap-1">
+									<div className="flex items-center gap-2">
+										<h3 className="font-bold">John Doe</h3>
+									</div>
+									<div className="flex items-center gap-0.5">
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+										<StarIcon className="w-5 h-5 fill-primary" />
+									</div>
+									<p className="text-muted-foreground">
+										Es un producto muy bueno!!!
+									</p>
+								</div>
+							</div>
+						</div>
+						<div className="mt-6 flex gap-2">
+							<Input placeholder="Add a review..." />
+							<Button>Submit</Button>
 						</div>
 					</div>
 				</div>
