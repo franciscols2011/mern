@@ -29,7 +29,7 @@ export const fetchAllAddress = createAsyncThunk(
 
 export const editAddress = createAsyncThunk(
 	"/address/editAddress",
-	async (userId, addressId, formData) => {
+	async ({ userId, addressId, formData }) => {
 		const response = await axios.put(
 			`http://localhost:5000/api/shop/address/update/${userId}/${addressId}`,
 			formData
@@ -40,7 +40,7 @@ export const editAddress = createAsyncThunk(
 
 export const deleteAddress = createAsyncThunk(
 	"/address/deleteAddress",
-	async (userId, addressId) => {
+	async ({ userId, addressId }) => {
 		const response = await axios.delete(
 			`http://localhost:5000/api/shop/address/delete/${userId}/${addressId}`
 		);
@@ -59,18 +59,23 @@ const addressSlice = createSlice({
 			})
 			.addCase(addNewAddress.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.addressList = action.payload.data;
+
+				state.addressList.push(action.payload.data);
 			})
 			.addCase(addNewAddress.rejected, (state) => {
 				state.isLoading = false;
-				state.addressList = [];
 			})
 			.addCase(fetchAllAddress.pending, (state) => {
 				state.isLoading = true;
 			})
 			.addCase(fetchAllAddress.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.addressList = action.payload.data;
+
+				if (action.payload && action.payload.data) {
+					state.addressList = action.payload.data;
+				} else {
+					state.addressList = [];
+				}
 			})
 			.addCase(fetchAllAddress.rejected, (state) => {
 				state.isLoading = false;
@@ -94,10 +99,14 @@ const addressSlice = createSlice({
 			})
 			.addCase(deleteAddress.fulfilled, (state, action) => {
 				state.isLoading = false;
-				const deletedAddressId = action.payload.data.id;
-				state.addressList = state.addressList.filter(
-					(address) => address.id !== deletedAddressId
-				);
+
+				if (action.payload && action.payload.data) {
+					const deletedAddressId = action.payload.data.id;
+
+					state.addressList = state.addressList.filter(
+						(address) => address.id !== deletedAddressId
+					);
+				}
 			})
 			.addCase(deleteAddress.rejected, (state) => {
 				state.isLoading = false;

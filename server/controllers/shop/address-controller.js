@@ -1,4 +1,5 @@
 const Address = require("../../models/Address");
+const mongoose = require("mongoose");
 
 const addAddress = async (req, res) => {
 	try {
@@ -101,16 +102,20 @@ const editAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
 	try {
 		const { userId, addressId } = req.params;
-		if (!userId || !addressId) {
+
+		if (
+			!mongoose.Types.ObjectId.isValid(userId) ||
+			!mongoose.Types.ObjectId.isValid(addressId)
+		) {
 			return res.status(400).json({
 				success: false,
-				message: " User and address id is mandatory!",
+				message: "Invalid userId or addressId",
 			});
 		}
 
 		const address = await Address.findOneAndDelete({
 			_id: addressId,
-			userId,
+			userId: userId,
 		});
 
 		if (!address) {
@@ -128,7 +133,7 @@ const deleteAddress = async (req, res) => {
 		console.log(e);
 		res.status(500).json({
 			success: false,
-			message: "Some error occured",
+			message: "Some error occurred",
 		});
 	}
 };
