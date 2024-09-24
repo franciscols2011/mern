@@ -3,8 +3,8 @@ import accountImage from "../../assets/account.jpg";
 import { TabsTrigger } from "/components/ui/tabs";
 import { TabsList } from "/components/ui/tabs";
 import { TabsContent } from "/components/ui/tabs";
-import Orders from "/src/components/shopping-view/orders";
 import Address from "/src/components/shopping-view/address";
+import ShoppingOrders from "/src/components/shopping-view/orders";
 
 function ShoppingAccount() {
 	return (
@@ -23,7 +23,7 @@ function ShoppingAccount() {
 							<TabsTrigger value="address">Address</TabsTrigger>
 						</TabsList>
 						<TabsContent value="orders">
-							<Orders />
+							<ShoppingOrders />
 						</TabsContent>
 						<TabsContent value="address">
 							<Address />
