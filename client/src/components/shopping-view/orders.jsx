@@ -9,7 +9,13 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "/components/ui/card";
 import { Button } from "../ui/button";
 
+import ShoppingOrdersDetailsView from "./orders-details";
+import { useState } from "react";
+import { Dialog } from "/components/ui/dialog";
+import { DialogContent } from "../../../components/ui/dialog";
+
 function ShoppingOrders() {
+	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	return (
 		<Card>
 			<CardHeader>
@@ -35,7 +41,15 @@ function ShoppingOrders() {
 							<TableCell>Pending</TableCell>
 							<TableCell>$100</TableCell>
 							<TableCell>
-								<Button>Details</Button>
+								<Dialog
+									open={openDetailsDialog}
+									onOpenChange={setOpenDetailsDialog}
+								>
+									<Button onClick={() => setOpenDetailsDialog(true)}>
+										View Details
+									</Button>
+									<ShoppingOrdersDetailsView />
+								</Dialog>
 							</TableCell>
 						</TableRow>
 					</TableBody>
