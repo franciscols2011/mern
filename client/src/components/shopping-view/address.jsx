@@ -22,7 +22,7 @@ const initialAddressFromData = {
 	notes: "",
 };
 
-function Address() {
+function Address({ setCurrentSelectedAddress }) {
 	const [formData, setFormData] = useState(initialAddressFromData);
 	const [currentEditedId, setCurrentEditedId] = useState(null);
 	const dispatch = useDispatch();
@@ -124,6 +124,7 @@ function Address() {
 								handleDeleteAddress={handleDeleteAddress}
 								addressInfo={singleAddressItem}
 								handleEditAddress={handleEditAddress}
+								setCurrentSelectedAddress={setCurrentSelectedAddress}
 							/>
 					  ))
 					: null}
