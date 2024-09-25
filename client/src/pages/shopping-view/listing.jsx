@@ -1,21 +1,24 @@
 import { ArrowUpDownIcon } from "lucide-react";
-import { DropdownMenuTrigger } from "/components/ui/dropdown-menu";
-import { DropdownMenu } from "/components/ui/dropdown-menu";
+import {
+	DropdownMenuTrigger,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+} from "/components/ui/dropdown-menu";
 import ProductFilter from "/src/components/shopping-view/filter";
 import { Button } from "/src/components/ui/button";
-import { DropdownMenuContent } from "/components/ui/dropdown-menu";
-import { DropdownMenuRadioGroup } from "/components/ui/dropdown-menu";
 import { sortOptions } from "/src/config";
-import { DropdownMenuRadioItem } from "/components/ui/dropdown-menu";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { fetchAllFilteredProducts } from "/src/store/shop/products-slice";
+import {
+	fetchAllFilteredProducts,
+	fetchProductDetails,
+} from "/src/store/shop/products-slice";
 import ShoppingProductTile from "/src/components/shopping-view/product-tile";
-import { createSearchParams, useSearchParams } from "react-router-dom";
-import { fetchProductDetails } from "/src/store/shop/products-slice";
+import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "/src/components/shopping-view/product-details";
-import { addToCart } from "/src/store/shop/cart-slice";
-import { fetchCartItems } from "/src/store/shop/cart-slice";
+import { addToCart, fetchCartItems } from "/src/store/shop/cart-slice";
 import { useToast } from "/src/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {
@@ -34,7 +37,6 @@ function createSearchParamsHelper(filterParams) {
 
 function ShoppingListing() {
 	const dispatch = useDispatch();
-
 	const { productList, productDetails } = useSelector(
 		(state) => state.shopProducts
 	);
@@ -73,7 +75,6 @@ function ShoppingListing() {
 	}
 
 	function handleGetProductDetails(getCurrentProductId) {
-		console.log(getCurrentProductId);
 		dispatch(fetchProductDetails(getCurrentProductId));
 	}
 
@@ -118,51 +119,63 @@ function ShoppingListing() {
 	}, [productDetails]);
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
-			<ProductFilter filters={filters} handleFilter={handleFilter} />
-			<div className="bg-background w-full rounded-lg shadow-sm">
-				<div className="p-4 border-b flex items-center justify-between">
-					<h2 className="text-lg font-extrabold">Products</h2>
-					<div className="flex items-center gap-3">
-						<span className="text-muted-foreground">
-							{productList?.length} Products
-						</span>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex items-center gap-1"
-								>
-									<ArrowUpDownIcon className="h-4 w-4" />
-									<span>Sort by</span>
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-[200px]">
-								<DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
-									{sortOptions.map((sortItem) => (
-										<DropdownMenuRadioItem
-											value={sortItem.id}
-											key={sortItem.id}
-										>
-											{sortItem.label}
-										</DropdownMenuRadioItem>
-									))}
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+		<div className="flex flex-col md:flex-row gap-6 p-4 md:p-6">
+			<div className="w-full md:w-1/4">
+				<ProductFilter filters={filters} handleFilter={handleFilter} />
+			</div>
+			<div className="w-full md:w-3/4">
+				<div className="bg-white rounded-lg shadow">
+					<div className="p-4 border-b flex items-center justify-between">
+						<h2 className="text-xl font-bold text-gray-800">Products</h2>
+						<div className="flex items-center gap-3">
+							<span className="text-gray-600">
+								{productList?.length} Products
+							</span>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="outline"
+										size="sm"
+										className="flex items-center gap-1"
+									>
+										<ArrowUpDownIcon className="h-4 w-4" />
+										<span>Sort by</span>
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-48">
+									<DropdownMenuRadioGroup
+										value={sort}
+										onValueChange={handleSort}
+									>
+										{sortOptions.map((sortItem) => (
+											<DropdownMenuRadioItem
+												value={sortItem.id}
+												key={sortItem.id}
+											>
+												{sortItem.label}
+											</DropdownMenuRadioItem>
+										))}
+									</DropdownMenuRadioGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
 					</div>
-				</div>
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-					{productList && productList.length > 0
-						? productList.map((productItem) => (
+					<div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+						{productList && productList.length > 0 ? (
+							productList.map((productItem) => (
 								<ShoppingProductTile
+									key={productItem.id}
 									handleGetProductDetails={handleGetProductDetails}
 									product={productItem}
 									handleAddToCart={handleAddToCart}
 								/>
-						  ))
-						: null}
+							))
+						) : (
+							<p className="text-center text-gray-500 w-full col-span-full">
+								No products found.
+							</p>
+						)}
+					</div>
 				</div>
 			</div>
 			<ProductDetailsDialog

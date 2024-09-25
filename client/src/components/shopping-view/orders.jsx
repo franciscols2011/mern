@@ -14,71 +14,127 @@ import { useEffect, useState } from "react";
 import { Dialog } from "/components/ui/dialog";
 import { DialogContent } from "../../../components/ui/dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllOrdersByUserId } from "/src/store/shop/order-slice";
+import {
+	getAllOrdersByUserId,
+	getOrderDetails,
+	resetOrderDetails,
+} from "/src/store/shop/order-slice";
 import { Badge } from "/components/ui/badge";
 
 function ShoppingOrders() {
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	const dispatch = useDispatch();
 	const { user } = useSelector((state) => state.auth);
-	const { orderList } = useSelector((state) => state.shopOrder);
+	const { orderList, orderDetails } = useSelector((state) => state.shopOrder);
+
+	function handleFetchOrderDetails(getId) {
+		dispatch(getOrderDetails(getId));
+	}
 
 	useEffect(() => {
-		dispatch(getAllOrdersByUserId(user?.id));
-	}, [dispatch]);
+		if (user?.id) {
+			dispatch(getAllOrdersByUserId(user.id));
+		}
+	}, [dispatch, user?.id]);
 
-	console.log(orderList, "orderList");
+	useEffect(() => {
+		if (orderDetails !== null) setOpenDetailsDialog(true);
+	}, [orderDetails]);
 
 	return (
-		<Card>
+		<Card className="bg-white rounded-lg shadow-md">
 			<CardHeader>
-				<CardTitle>Order History</CardTitle>
+				<CardTitle className="text-2xl font-bold text-gray-800">
+					Order History
+				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<Table>
+				<Table className="min-w-full">
 					<TableHeader>
-						<TableRow>
-							<TableHead>ORDER ID</TableHead>
-							<TableHead>ORDER DATE</TableHead>
-							<TableHead>ORDER STATUS</TableHead>
-							<TableHead>ORDER PRICE</TableHead>
-							<TableHead>
+						<TableRow className="bg-gray-100">
+							<TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								ORDER ID
+							</TableHead>
+							<TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								ORDER DATE
+							</TableHead>
+							<TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								ORDER STATUS
+							</TableHead>
+							<TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								ORDER PRICE
+							</TableHead>
+							<TableHead className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
 								<span className="sr-only">Details</span>
 							</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{orderList && orderList.length > 0
-							? orderList.map((orderItem) => (
-									<TableRow>
-										<TableCell>{orderItem?._id}</TableCell>
-										<TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
-										<TableCell>
-											<Badge
-												className={`py-1 px-3 ${
-													orderItem?.orderStatus === "pending"
-														? "bg-black"
-														: "bg-green-500"
-												}`}
+						{orderList && orderList.length > 0 ? (
+							orderList.map((orderItem) => (
+								<TableRow key={orderItem?._id} className="hover:bg-gray-50">
+									<TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+										{orderItem?._id || "N/A"}
+									</TableCell>
+									<TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+										{orderItem?.orderDate
+											? orderItem.orderDate.split("T")[0]
+											: "N/A"}
+									</TableCell>
+									<TableCell className="px-6 py-4 whitespace-nowrap text-sm">
+										<Badge
+											className={`py-1 px-3 rounded-full font-semibold text-white ${
+												orderItem?.orderStatus === "pending"
+													? "bg-yellow-500"
+													: "bg-green-500"
+											}`}
+										>
+											{orderItem?.orderStatus
+												? orderItem.orderStatus.charAt(0).toUpperCase() +
+												  orderItem.orderStatus.slice(1)
+												: "N/A"}
+										</Badge>
+									</TableCell>
+									<TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+										$
+										{typeof orderItem?.totalAmount === "number"
+											? orderItem.totalAmount.toFixed(2)
+											: "N/A"}
+									</TableCell>
+									<TableCell className="px-6 py-4 whitespace-nowrap text-center text-sm">
+										<Dialog
+											open={openDetailsDialog}
+											onOpenChange={() => {
+												setOpenDetailsDialog(false);
+												dispatch(resetOrderDetails());
+											}}
+										>
+											<Button
+												variant="solid"
+												className="bg-gray-800 text-white hover:bg-gray-700"
+												onClick={() => handleFetchOrderDetails(orderItem?._id)}
 											>
-												{orderItem?.orderStatus}
-											</Badge>
-										</TableCell>
-										<TableCell>{orderItem?.totalAmount}</TableCell>
-										<TableCell>
-											<Dialog
-												open={openDetailsDialog}
-												onOpenChange={setOpenDetailsDialog}
-											>
-												<Button onClick={() => setOpenDetailsDialog(true)}>
-													View Details
-												</Button>
-												<ShoppingOrdersDetailsView />
-											</Dialog>
-										</TableCell>
-									</TableRow>
-							  ))
-							: null}
+												View Details
+											</Button>
+											<DialogContent className="sm:max-w-[700px] p-6 bg-white rounded-lg shadow-lg">
+												<ShoppingOrdersDetailsView
+													orderDetails={orderDetails}
+												/>
+											</DialogContent>
+										</Dialog>
+									</TableCell>
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={5}
+									className="px-6 py-4 text-center text-sm text-gray-500"
+								>
+									No orders found.
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</CardContent>

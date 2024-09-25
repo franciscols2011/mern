@@ -6,6 +6,7 @@ import { Button } from "/src/components/ui/button";
 import { useState } from "react";
 import { createNewOrder } from "/src/store/shop/order-slice";
 import { useToast } from "/src/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 function ShoppingCheckout() {
 	const { cartItems } = useSelector((state) => state.shopCart);
@@ -15,8 +16,6 @@ function ShoppingCheckout() {
 	const [isPaymentStart, setIsPaymentStart] = useState(false);
 	const dispatch = useDispatch();
 	const { toast } = useToast();
-
-	console.log(currentSelectedAddress, "currentSelectedAddress");
 
 	const totalCartAmount =
 		cartItems && cartItems.items && cartItems.items.length > 0
@@ -32,12 +31,13 @@ function ShoppingCheckout() {
 			: 0;
 
 	function handleInitialPaypalPayment() {
+		if (isPaymentStart) return;
+
 		if (cartItems.length === 0) {
 			toast({
 				title: "Your cart is empty",
 				variant: "destructive",
 			});
-
 			return;
 		}
 
@@ -46,9 +46,10 @@ function ShoppingCheckout() {
 				title: "Please select an address",
 				variant: "destructive",
 			});
-
 			return;
 		}
+
+		setIsPaymentStart(true);
 
 		const orderData = {
 			userId: user?.id,
@@ -82,7 +83,6 @@ function ShoppingCheckout() {
 		};
 
 		dispatch(createNewOrder(orderData)).then((data) => {
-			console.log(data, "data");
 			if (data?.payload?.success) {
 				setIsPaymentStart(true);
 			} else {
@@ -96,45 +96,68 @@ function ShoppingCheckout() {
 	}
 
 	return (
-		<div className="flex flex-col">
-			<div className="relative h-[300px] w-full overflow-hidden">
-				<img src={img} className="h-full w-full object-cover object-center" />
+		<div className="flex flex-col min-h-screen">
+			<div className="relative w-full h-64 md:h-96 overflow-hidden">
+				<img
+					src={img}
+					alt="Account"
+					className="w-full h-full object-cover object-center"
+				/>
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5">
-				<Address setCurrentSelectedAddress={setCurrentSelectedAddress} />
-				<div className="flex flex-col gap-4">
-					{cartItems && cartItems.items && cartItems.items.length > 0
-						? cartItems.items.map((item) => (
-								<div key={item._id}>
+			<div className="container mx-auto px-4 py-8">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+					<Address setCurrentSelectedAddress={setCurrentSelectedAddress} />
+					<div className="flex flex-col gap-6">
+						{cartItems && cartItems.items && cartItems.items.length > 0 ? (
+							cartItems.items.map((item) => (
+								<div
+									key={item._id}
+									className="bg-white rounded-lg shadow-md p-4"
+								>
 									<UserCartItemsContent cartItem={item} />
-									<div className="flex justify-between items-center mt-2">
+									<div className="flex justify-between items-center mt-4">
 										{item.salePrice > 0 ? (
-											<div className="flex items-center">
-												<span className="text-gray-500 line-through mr-2">
+											<div className="flex items-center space-x-2">
+												<span className="text-lg text-gray-500 line-through">
 													${(item.price * item.quantity).toFixed(2)}
 												</span>
-												<span className="font-bold text-red-500">
+												<span className="text-xl font-bold text-red-600">
 													${(item.salePrice * item.quantity).toFixed(2)}
 												</span>
 											</div>
 										) : (
-											""
+											<span className="text-xl font-bold text-gray-800">
+												${(item.price * item.quantity).toFixed(2)}
+											</span>
 										)}
 									</div>
 								</div>
-						  ))
-						: null}
-
-					<div className="mt-8 space-y-4">
-						<div className="flex justify-between">
-							<span className="font-bold">Total</span>
-							<span className="font-bold">${totalCartAmount.toFixed(2)}</span>
+							))
+						) : (
+							<p className="text-gray-500">Your cart is empty.</p>
+						)}
+						<div className="mt-8 p-4 bg-gray-50 rounded-lg">
+							<div className="flex justify-between items-center">
+								<span className="text-lg font-semibold text-gray-700">
+									Total:
+								</span>
+								<span className="text-2xl font-bold text-gray-900">
+									${totalCartAmount.toFixed(2)}
+								</span>
+							</div>
 						</div>
-					</div>
-					<div className="mt-4 w-full justify-center">
-						<Button onClick={handleInitialPaypalPayment} className="w-full">
-							Checkout with PayPal
-						</Button>
+						<div className="mt-4">
+							<Button
+								onClick={handleInitialPaypalPayment}
+								disabled={isPaymentStart}
+								className="w-full bg-gray-800 text-white hover:bg-gray-700 flex items-center justify-center"
+							>
+								{isPaymentStart ? (
+									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
+								) : null}
+								Checkout with PayPal
+							</Button>
+						</div>
 					</div>
 				</div>
 			</div>
