@@ -5,13 +5,16 @@ import UserCartItemsContent from "/src/components/shopping-view/cart-items-conte
 import { Button } from "/src/components/ui/button";
 import { useState } from "react";
 import { createNewOrder } from "/src/store/shop/order-slice";
+import { useToast } from "/src/hooks/use-toast";
 
 function ShoppingCheckout() {
 	const { cartItems } = useSelector((state) => state.shopCart);
 	const { user } = useSelector((state) => state.auth);
+	const { approvalURL } = useSelector((state) => state.shopOrder);
 	const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
 	const [isPaymentStart, setIsPaymentStart] = useState(false);
 	const dispatch = useDispatch();
+	const { toast } = useToast();
 
 	console.log(currentSelectedAddress, "currentSelectedAddress");
 
@@ -29,8 +32,27 @@ function ShoppingCheckout() {
 			: 0;
 
 	function handleInitialPaypalPayment() {
+		if (cartItems.length === 0) {
+			toast({
+				title: "Your cart is empty",
+				variant: "destructive",
+			});
+
+			return;
+		}
+
+		if (currentSelectedAddress === null) {
+			toast({
+				title: "Please select an address",
+				variant: "destructive",
+			});
+
+			return;
+		}
+
 		const orderData = {
 			userId: user?.id,
+			cartId: cartItems._id,
 			cartItems: cartItems.items.map((singleCartItem) => ({
 				productId: singleCartItem?.productId,
 				title: singleCartItem?.title,
@@ -62,8 +84,15 @@ function ShoppingCheckout() {
 		dispatch(createNewOrder(orderData)).then((data) => {
 			console.log(data, "data");
 			if (data?.payload?.success) {
+				setIsPaymentStart(true);
+			} else {
+				setIsPaymentStart(false);
 			}
 		});
+	}
+
+	if (approvalURL) {
+		window.location.href = approvalURL;
 	}
 
 	return (
