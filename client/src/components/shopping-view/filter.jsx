@@ -1,3 +1,5 @@
+// /src/components/shopping-view/filter.js
+
 import { Fragment } from "react";
 import { filterOptions } from "/src/config";
 import { Label } from "../ui/label";

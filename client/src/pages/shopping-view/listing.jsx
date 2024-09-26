@@ -1,3 +1,5 @@
+// /src/components/shopping-view/shopping-listing.js
+
 import { ArrowUpDownIcon } from "lucide-react";
 import {
 	DropdownMenuTrigger,
@@ -16,7 +18,7 @@ import {
 	fetchProductDetails,
 } from "/src/store/shop/products-slice";
 import ShoppingProductTile from "/src/components/shopping-view/product-tile";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import ProductDetailsDialog from "/src/components/shopping-view/product-details";
 import { addToCart, fetchCartItems } from "/src/store/shop/cart-slice";
 import { useToast } from "/src/hooks/use-toast";
@@ -30,27 +32,32 @@ function ShoppingListing() {
 	const [filters, setFilters] = useState({});
 	const [sort, setSort] = useState("price-lowtohigh");
 	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	const { toast } = useToast();
 
+	// Function to parse search params into filters
 	function parseSearchParamsToFilters(params) {
 		const newFilters = {};
 		for (const [key, value] of params.entries()) {
-			newFilters[key] = value.split(",");
+			if (value) {
+				const valuesArray = value.split(",").filter((v) => v !== "");
+				if (valuesArray.length > 0) {
+					newFilters[key] = valuesArray;
+				}
+			}
 		}
 		return newFilters;
 	}
 
+	// Update filters when location.search changes
 	useEffect(() => {
-		const initialFilters = parseSearchParamsToFilters(searchParams);
-		setFilters(initialFilters);
-	}, []);
-
-	useEffect(() => {
-		const newFilters = parseSearchParamsToFilters(searchParams);
+		const params = new URLSearchParams(location.search);
+		const newFilters = parseSearchParamsToFilters(params);
 		setFilters(newFilters);
-	}, [searchParams]);
+	}, [location.search]);
 
+	// Fetch products when filters or sort change
 	useEffect(() => {
 		if (filters && sort) {
 			dispatch(
@@ -70,20 +77,26 @@ function ShoppingListing() {
 			? sectionFilters.filter((id) => id !== optionId)
 			: [...sectionFilters, optionId];
 
-		const newFilters = {
-			...filters,
-			[sectionId]: updatedSectionFilters,
-		};
+		// Create a new filters object
+		const newFilters = { ...filters };
 
+		if (updatedSectionFilters.length > 0) {
+			newFilters[sectionId] = updatedSectionFilters;
+		} else {
+			delete newFilters[sectionId];
+		}
+
+		// Update URL search params
 		const params = new URLSearchParams();
 		for (const [key, value] of Object.entries(newFilters)) {
 			if (value.length > 0) {
 				params.set(key, value.join(","));
-			} else {
-				params.delete(key);
 			}
 		}
 		setSearchParams(params);
+
+		// Update filters state immediately
+		setFilters(newFilters);
 	}
 
 	function handleGetProductDetails(productId) {
