@@ -6,7 +6,7 @@ import { Separator } from "/components/ui/separator";
 import { Badge } from "/components/ui/badge";
 import CommonForm from "../common/form";
 import {
-	// updateOrderStatus,
+	updateOrderStatus,
 	getOrderDetailsForAdmin,
 	getAllOrdersForAdmin,
 } from "/src/store/admin/order-slice";
@@ -63,6 +63,24 @@ function AdminOrdersDetailsView({ orderDetails }) {
 		return <DialogContent>Loading order details...</DialogContent>;
 	}
 
+	function getStatusColor(orderStatus) {
+		switch (orderStatus) {
+			case "pending":
+				return "bg-yellow-500";
+			case "inProcess":
+				return "bg-blue-500";
+			case "inShipping":
+				return "bg-orange-500";
+			case "delivered":
+			case "confirmed":
+				return "bg-green-500";
+			case "rejected":
+				return "bg-red-500";
+			default:
+				return "bg-gray-500";
+		}
+	}
+
 	return (
 		<DialogContent className="sm:max-w-[700px] p-6 bg-white rounded-lg shadow-lg">
 			<div className="space-y-6">
@@ -112,13 +130,9 @@ function AdminOrdersDetailsView({ orderDetails }) {
 							<span className="font-semibold text-gray-700">Order Status:</span>
 							<Label>
 								<Badge
-									className={`py-1 px-3 rounded-full font-semibold text-white ${
-										orderDetails?.orderStatus === "pending"
-											? "bg-yellow-500"
-											: orderDetails?.orderStatus === "confirmed"
-											? "bg-green-500"
-											: "bg-red-500"
-									}`}
+									className={`py-1 px-3 rounded-full font-semibold text-white ${getStatusColor(
+										orderDetails?.orderStatus
+									)}`}
 								>
 									{orderDetails?.orderStatus
 										? orderDetails.orderStatus.charAt(0).toUpperCase() +
@@ -228,14 +242,14 @@ function AdminOrdersDetailsView({ orderDetails }) {
 									{ id: "inProcess", label: "In Process" },
 									{ id: "inShipping", label: "In Shipping" },
 									{ id: "rejected", label: "Rejected" },
-									{ id: "delivered", label: "Delivered" },
+									{ id: "confirmed", label: "Confirmed" },
 								],
 							},
 						]}
 						formData={formData}
 						setFormData={setFormData}
 						buttonText={"Update Order Status"}
-						// onSubmit={handleUpdateStatus}
+						onSubmit={handleUpdateStatus}
 					/>
 				</div>
 			</div>

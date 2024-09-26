@@ -8,7 +8,6 @@ import {
 } from "/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "/components/ui/card";
 import { Button } from "../ui/button";
-
 import ShoppingOrdersDetailsView from "./orders-details";
 import { useEffect, useState } from "react";
 import { Dialog } from "/components/ui/dialog";
@@ -40,6 +39,24 @@ function ShoppingOrders() {
 	useEffect(() => {
 		if (orderDetails !== null) setOpenDetailsDialog(true);
 	}, [orderDetails]);
+
+	function getStatusColor(orderStatus) {
+		switch (orderStatus) {
+			case "pending":
+				return "bg-yellow-500";
+			case "inProcess":
+				return "bg-blue-500";
+			case "inShipping":
+				return "bg-orange-500";
+			case "delivered":
+			case "confirmed":
+				return "bg-green-500";
+			case "rejected":
+				return "bg-red-500";
+			default:
+				return "bg-gray-500";
+		}
+	}
 
 	return (
 		<Card className="bg-white rounded-lg shadow-md">
@@ -83,11 +100,9 @@ function ShoppingOrders() {
 									</TableCell>
 									<TableCell className="px-6 py-4 whitespace-nowrap text-sm">
 										<Badge
-											className={`py-1 px-3 rounded-full font-semibold text-white ${
-												orderItem?.orderStatus === "pending"
-													? "bg-yellow-500"
-													: "bg-green-500"
-											}`}
+											className={`py-1 px-3 rounded-full font-semibold text-white ${getStatusColor(
+												orderItem?.orderStatus
+											)}`}
 										>
 											{orderItem?.orderStatus
 												? orderItem.orderStatus.charAt(0).toUpperCase() +

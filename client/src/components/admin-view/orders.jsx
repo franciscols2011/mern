@@ -33,15 +33,27 @@ function AdminOrdersView() {
 		if (orderDetails !== null) setOpenDetailsDialog(true);
 	}, [orderDetails]);
 
-	console.log(orderDetails, "orderDetails");
-
 	function handleFetchOrderDetails(orderId) {
 		dispatch(getOrderDetailsForAdmin(orderId));
 	}
 
-	useEffect(() => {
-		if (orderDetails !== null) setOpenDetailsDialog(true);
-	}, [orderDetails]);
+	function getStatusColor(orderStatus) {
+		switch (orderStatus) {
+			case "pending":
+				return "bg-yellow-500";
+			case "inProcess":
+				return "bg-blue-500";
+			case "inShipping":
+				return "bg-orange-500";
+			case "delivered":
+			case "confirmed":
+				return "bg-green-500";
+			case "rejected":
+				return "bg-red-500";
+			default:
+				return "bg-gray-500";
+		}
+	}
 
 	return (
 		<Card className="bg-white rounded-lg shadow-md">
@@ -85,11 +97,9 @@ function AdminOrdersView() {
 									</TableCell>
 									<TableCell className="px-6 py-4 whitespace-nowrap text-sm">
 										<Badge
-											className={`py-1 px-3 rounded-full font-semibold text-white ${
-												orderItem?.orderStatus === "pending"
-													? "bg-yellow-500"
-													: "bg-green-500"
-											}`}
+											className={`py-1 px-3 rounded-full font-semibold text-white ${getStatusColor(
+												orderItem?.orderStatus
+											)}`}
 										>
 											{orderItem?.orderStatus
 												? orderItem.orderStatus.charAt(0).toUpperCase() +

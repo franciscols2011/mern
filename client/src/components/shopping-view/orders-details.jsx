@@ -7,6 +7,24 @@ import { useSelector } from "react-redux";
 function ShoppingOrdersDetailsView({ orderDetails }) {
 	const { user } = useSelector((state) => state.auth);
 
+	function getStatusColor(orderStatus) {
+		switch (orderStatus) {
+			case "pending":
+				return "bg-yellow-500";
+			case "inProcess":
+				return "bg-blue-500";
+			case "inShipping":
+				return "bg-orange-500";
+			case "delivered":
+			case "confirmed":
+				return "bg-green-500";
+			case "rejected":
+				return "bg-red-500";
+			default:
+				return "bg-gray-500";
+		}
+	}
+
 	return (
 		<DialogContent className="sm:max-w-[700px] p-6 bg-white rounded-lg shadow-lg">
 			<div className="space-y-6">
@@ -62,11 +80,9 @@ function ShoppingOrdersDetailsView({ orderDetails }) {
 							<span className="font-semibold text-gray-700">Order Status:</span>
 							<Label>
 								<Badge
-									className={`py-1 px-3 rounded-full font-semibold text-white ${
-										orderDetails?.orderStatus === "pending"
-											? "bg-yellow-500"
-											: "bg-green-500"
-									}`}
+									className={`py-1 px-3 rounded-full font-semibold text-white ${getStatusColor(
+										orderDetails?.orderStatus
+									)}`}
 								>
 									{orderDetails?.orderStatus
 										? orderDetails.orderStatus.charAt(0).toUpperCase() +
