@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 import { CardFooter, CardContent, Card } from "/components/ui/card";
 import { Badge } from "/components/ui/badge";
 import { Button } from "../ui/button";
@@ -9,6 +11,41 @@ function ShoppingProductTile({
 	handleGetProductDetails,
 	handleAddToCart,
 }) {
+	const cartItems = useSelector(
+		(state) => state.shopCart.cartItems.items || []
+	);
+	const cartItem = cartItems.find((item) => item.productId === product._id);
+	const currentQuantityInCart = cartItem ? cartItem.quantity : 0;
+
+	const [localQuantityInCart, setLocalQuantityInCart] = useState(
+		currentQuantityInCart
+	);
+
+	const [isAdding, setIsAdding] = useState(false);
+
+	useEffect(() => {
+		setLocalQuantityInCart(currentQuantityInCart);
+		setIsAdding(false);
+	}, [currentQuantityInCart]);
+
+	const remainingStock = product.totalStock - localQuantityInCart;
+
+	const isDisabled =
+		localQuantityInCart >= product.totalStock ||
+		product.totalStock === 0 ||
+		isAdding;
+
+	const handleAdd = () => {
+		if (!isDisabled) {
+			setIsAdding(true);
+			setLocalQuantityInCart((prev) => prev + 1);
+
+			handleAddToCart(product?._id, product?.totalStock).finally(() => {
+				setIsAdding(false);
+			});
+		}
+	};
+
 	return (
 		<Card className="w-full max-w-sm mx-auto bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
 			<div
@@ -21,11 +58,20 @@ function ShoppingProductTile({
 						alt={product?.title}
 						className="w-full h-[300px] object-cover rounded-t-lg"
 					/>
-					{product?.salePrice > 0 && (
-						<Badge className="absolute top-2 left-2 bg-red-500 text-white">
-							Sale
-						</Badge>
-					)}
+					<div className="absolute top-2 left-2 flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-1">
+						{remainingStock <= 0 ? (
+							<Badge className="bg-gray-500 text-white">Out of Stock</Badge>
+						) : (
+							<>
+								{product?.salePrice > 0 && (
+									<Badge className="bg-red-500 text-white">Sale</Badge>
+								)}
+								{remainingStock < 10 && (
+									<Badge className="bg-yellow-500 text-white">{`Only ${remainingStock} left in stock`}</Badge>
+								)}
+							</>
+						)}
+					</div>
 				</div>
 				<CardContent className="p-4">
 					<h2 className="text-xl font-bold mb-2 text-gray-800">
@@ -59,10 +105,16 @@ function ShoppingProductTile({
 			</div>
 			<CardFooter className="p-4 bg-gray-50 rounded-b-lg">
 				<Button
-					onClick={() => handleAddToCart(product?._id)}
-					className="w-full bg-gray-800 text-white hover:bg-gray-700 flex items-center justify-center"
+					onClick={handleAdd}
+					className={`w-full ${
+						isDisabled
+							? "bg-gray-400 cursor-not-allowed"
+							: "bg-gray-800 hover:bg-gray-700"
+					} text-white flex items-center justify-center`}
+					disabled={isDisabled}
 				>
-					<ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart
+					<ShoppingCart className="w-5 h-5 mr-2" />
+					{isDisabled ? "Out of Stock" : "Add to Cart"}
 				</Button>
 			</CardFooter>
 		</Card>

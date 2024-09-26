@@ -1,5 +1,3 @@
-// /src/components/shopping-view/shopping-listing.js
-
 import { ArrowUpDownIcon } from "lucide-react";
 import {
 	DropdownMenuTrigger,
@@ -22,12 +20,14 @@ import { useSearchParams, useLocation } from "react-router-dom";
 import ProductDetailsDialog from "/src/components/shopping-view/product-details";
 import { addToCart, fetchCartItems } from "/src/store/shop/cart-slice";
 import { useToast } from "/src/hooks/use-toast";
+import { cn } from "/src/lib/utils"; // Utility function for conditional classNames
 
 function ShoppingListing() {
 	const dispatch = useDispatch();
 	const { productList, productDetails } = useSelector(
 		(state) => state.shopProducts
 	);
+	const { cartItems } = useSelector((state) => state.shopCart);
 	const { user } = useSelector((state) => state.auth);
 	const [filters, setFilters] = useState({});
 	const [sort, setSort] = useState("price-lowtohigh");
@@ -36,7 +36,6 @@ function ShoppingListing() {
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	const { toast } = useToast();
 
-	// Function to parse search params into filters
 	function parseSearchParamsToFilters(params) {
 		const newFilters = {};
 		for (const [key, value] of params.entries()) {
@@ -50,14 +49,12 @@ function ShoppingListing() {
 		return newFilters;
 	}
 
-	// Update filters when location.search changes
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
 		const newFilters = parseSearchParamsToFilters(params);
 		setFilters(newFilters);
 	}, [location.search]);
 
-	// Fetch products when filters or sort change
 	useEffect(() => {
 		if (filters && sort) {
 			dispatch(
@@ -65,6 +62,12 @@ function ShoppingListing() {
 			);
 		}
 	}, [dispatch, filters, sort]);
+
+	useEffect(() => {
+		if (user?.id) {
+			dispatch(fetchCartItems(user.id));
+		}
+	}, [dispatch, user?.id]);
 
 	function handleSort(value) {
 		setSort(value);
@@ -77,7 +80,6 @@ function ShoppingListing() {
 			? sectionFilters.filter((id) => id !== optionId)
 			: [...sectionFilters, optionId];
 
-		// Create a new filters object
 		const newFilters = { ...filters };
 
 		if (updatedSectionFilters.length > 0) {
@@ -86,7 +88,6 @@ function ShoppingListing() {
 			delete newFilters[sectionId];
 		}
 
-		// Update URL search params
 		const params = new URLSearchParams();
 		for (const [key, value] of Object.entries(newFilters)) {
 			if (value.length > 0) {
@@ -95,7 +96,6 @@ function ShoppingListing() {
 		}
 		setSearchParams(params);
 
-		// Update filters state immediately
 		setFilters(newFilters);
 	}
 
@@ -103,7 +103,19 @@ function ShoppingListing() {
 		dispatch(fetchProductDetails(productId));
 	}
 
-	function handleAddToCart(productId) {
+	function handleAddToCart(productId, totalStock) {
+		const getCartItems = cartItems.items || [];
+		const cartItem = getCartItems.find((item) => item.productId === productId);
+		const currentQuantity = cartItem ? cartItem.quantity : 0;
+
+		if (currentQuantity + 1 > totalStock) {
+			toast({
+				title: `Only ${totalStock} units are available for this product`,
+				variant: "destructive",
+			});
+			return;
+		}
+
 		dispatch(
 			addToCart({
 				userId: user?.id,
@@ -125,16 +137,25 @@ function ShoppingListing() {
 	}, [productDetails]);
 
 	return (
-		<div className="flex flex-col md:flex-row gap-6 p-4 md:p-6">
+		<div className="flex flex-col md:flex-row gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+			{/* Filters Sidebar */}
 			<div className="w-full md:w-1/4">
-				<ProductFilter filters={filters} handleFilter={handleFilter} />
+				<div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
+					<h3 className="text-2xl font-bold mb-6 text-gray-800">
+						Filter Products
+					</h3>
+					<ProductFilter filters={filters} handleFilter={handleFilter} />
+				</div>
 			</div>
+			{/* Products Section */}
 			<div className="w-full md:w-3/4">
-				<div className="bg-white rounded-lg shadow">
-					<div className="p-4 border-b flex items-center justify-between">
-						<h2 className="text-xl font-bold text-gray-800">Products</h2>
+				<div className="bg-white rounded-lg shadow-lg">
+					<div className="p-6 border-b flex flex-col md:flex-row items-center justify-between">
+						<h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+							Products
+						</h2>
 						<div className="flex items-center gap-3">
-							<span className="text-gray-600">
+							<span className="text-gray-600 text-lg">
 								{productList?.length || 0} Products
 							</span>
 							<DropdownMenu>
@@ -142,13 +163,13 @@ function ShoppingListing() {
 									<Button
 										variant="outline"
 										size="sm"
-										className="flex items-center gap-1"
+										className="flex items-center gap-1 hover:bg-gray-100 transition-colors"
 									>
-										<ArrowUpDownIcon className="h-4 w-4" />
+										<ArrowUpDownIcon className="h-5 w-5" />
 										<span>Sort by</span>
 									</Button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-48">
+								<DropdownMenuContent align="end" className="w-56">
 									<DropdownMenuRadioGroup
 										value={sort}
 										onValueChange={handleSort}
@@ -166,7 +187,7 @@ function ShoppingListing() {
 							</DropdownMenu>
 						</div>
 					</div>
-					<div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+					<div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 						{productList && productList.length > 0 ? (
 							productList.map((productItem) => (
 								<ShoppingProductTile

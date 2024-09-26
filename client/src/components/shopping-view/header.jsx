@@ -7,13 +7,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuItem,
 } from "/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "/components/ui/avatar";
 import {
 	LayoutGrid,
 	LogOut,
 	Menu,
-	ShoppingBasket,
-	UserRoundCog,
+	ShoppingCart,
+	User as UserIcon,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -23,12 +22,11 @@ import { logoutUser } from "/src/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "/src/store/shop/cart-slice";
-import { Label } from "../ui/label";
-import { useSearchParams } from "react-router-dom";
+import { cn } from "/src/lib/utils";
+import { Input } from "../ui/input";
 
 function MenuItems() {
 	const navigate = useNavigate();
-	const [searchParams, setSearchParams] = useSearchParams();
 
 	function handleNavigate(getCurrentMenuItem) {
 		const currentFilter =
@@ -51,15 +49,15 @@ function MenuItems() {
 	}
 
 	return (
-		<nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
+		<nav className="flex flex-col lg:flex-row lg:items-center gap-6">
 			{shoppingViewHeaderMenuItems.map((menuItem) => (
-				<Label
+				<span
 					onClick={() => handleNavigate(menuItem)}
-					className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900"
+					className="text-lg font-medium cursor-pointer text-gray-800 hover:text-gray-600 transition-colors"
 					key={menuItem.id}
 				>
 					{menuItem.label}
-				</Label>
+				</span>
 			))}
 		</nav>
 	);
@@ -83,13 +81,20 @@ function HeaderRightContent() {
 	}, [dispatch, user?.id]);
 
 	return (
-		<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+		<div className="flex items-center gap-4">
+			<div className="hidden md:flex">
+				<Input
+					type="text"
+					placeholder="Search products..."
+					className="w-64 bg-gray-100 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-2"
+				/>
+			</div>
 			<Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
 				<SheetTrigger asChild>
-					<Button variant="outline" size="icon" className="relative">
-						<ShoppingBasket className="w-6 h-6" />
+					<Button variant="ghost" size="icon" className="relative">
+						<ShoppingCart className="w-6 h-6 text-gray-800" />
 						{cartItems && cartItems.items && cartItems.items.length > 0 && (
-							<span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+							<span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
 								{cartItems.items.length}
 							</span>
 						)}
@@ -109,35 +114,34 @@ function HeaderRightContent() {
 			</Sheet>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Avatar className="bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors">
-						<AvatarFallback className="bg-gray-800 text-white font-extrabold">
-							{user?.userName[0].toUpperCase()}
-						</AvatarFallback>
-					</Avatar>
+					<Button variant="ghost" size="icon" className="relative">
+						<UserIcon className="w-6 h-6 text-gray-800" />
+						<span className="sr-only">User Menu</span>
+					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					side="bottom"
 					align="end"
-					className="w-56 bg-white shadow-lg rounded-md mt-2"
+					className="w-56 bg-white text-gray-800 rounded-md mt-2 shadow-lg"
 				>
-					<DropdownMenuLabel className="font-semibold text-gray-700">
+					<DropdownMenuLabel className="font-semibold text-gray-800">
 						Logged in as {user?.userName}
 					</DropdownMenuLabel>
-					<DropdownMenuSeparator />
+					<DropdownMenuSeparator className="bg-gray-200" />
 					<DropdownMenuItem
 						onClick={() => navigate("/shop/account")}
 						className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
 					>
-						<UserRoundCog className="mr-2 h-4 w-4 text-gray-600" />
-						<span className="text-gray-700">Account</span>
+						<UserIcon className="h-4 w-4 text-gray-600" />
+						<span>Account</span>
 					</DropdownMenuItem>
-					<DropdownMenuSeparator />
+					<DropdownMenuSeparator className="bg-gray-200" />
 					<DropdownMenuItem
 						onClick={handleLogout}
 						className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
 					>
-						<LogOut className="mr-2 h-4 w-4 text-gray-600" />
-						<span className="text-gray-700">Logout</span>
+						<LogOut className="h-4 w-4 text-gray-600" />
+						<span>Logout</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -147,15 +151,17 @@ function HeaderRightContent() {
 
 function ShoppingHeader() {
 	return (
-		<header className="sticky top-0 z-50 border-b bg-white shadow">
-			<div className="flex h-16 items-center justify-between px-4 md:px-6">
+		<header className="sticky top-0 z-50 bg-white shadow-lg">
+			<div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
 				<Link to={"/shop/home"} className="flex items-center gap-2">
-					<LayoutGrid className="h-6 w-6 text-gray-800" />
-					<span className="font-bold text-xl text-gray-800">Ecommerce</span>
+					<LayoutGrid className="h-8 w-8 text-primary" />
+					<span className="font-extrabold text-2xl text-gray-800">
+						Ecommerce
+					</span>
 				</Link>
 				<Sheet>
 					<SheetTrigger asChild>
-						<Button variant="outline" size="icon" className="lg:hidden">
+						<Button variant="ghost" size="icon" className="lg:hidden">
 							<Menu className="h-6 w-6 text-gray-800" />
 							<span className="sr-only">Menu</span>
 						</Button>
@@ -165,11 +171,10 @@ function ShoppingHeader() {
 						<HeaderRightContent />
 					</SheetContent>
 				</Sheet>
-				<div className="hidden lg:flex">
+				<div className="hidden lg:flex items-center gap-8">
 					<MenuItems />
 				</div>
-
-				<div className="hidden lg:flex">
+				<div className="hidden lg:flex items-center gap-4">
 					<HeaderRightContent />
 				</div>
 			</div>

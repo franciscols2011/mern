@@ -9,11 +9,21 @@ function UserCartItemsContent({ cartItem }) {
 	const dispatch = useDispatch();
 	const { toast } = useToast();
 
+	const product = useSelector((state) =>
+		state.shopProducts.productList.find(
+			(item) => item._id === cartItem?.productId
+		)
+	);
+
 	const handleUpdateQuantity = (getCartItem, getAction) => {
 		const newQuantity =
 			getAction === "minus"
 				? getCartItem?.quantity - 1
 				: getCartItem?.quantity + 1;
+
+		if (getAction === "plus" && newQuantity > product?.totalStock) {
+			return;
+		}
 
 		if (newQuantity < 1) {
 			return;
@@ -78,6 +88,10 @@ function UserCartItemsContent({ cartItem }) {
 							variant="outline"
 							className="h-8 w-8 rounded-full p-0"
 							onClick={() => handleUpdateQuantity(cartItem, "plus")}
+							disabled={
+								product?.totalStock !== undefined &&
+								cartItem?.quantity >= product.totalStock
+							}
 						>
 							<Plus className="w-4 h-4 text-gray-700" />
 							<span className="sr-only">Increase</span>
