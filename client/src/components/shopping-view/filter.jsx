@@ -19,16 +19,11 @@ function ProductFilter({ filters, handleFilter }) {
 							<div className="grid gap-2 mt-2">
 								{filterOptions[keyItem].map((option) => (
 									<Label
-										key={option.value}
+										key={option.id}
 										className="flex font-semibold items-center gap-2"
 									>
 										<Checkbox
-											checked={
-												filters &&
-												Object.keys(filters).length > 0 &&
-												filters[keyItem] &&
-												filters[keyItem].indexOf(option.id) > -1
-											}
+											checked={filters[keyItem]?.includes(option.id)}
 											onCheckedChange={() => handleFilter(keyItem, option.id)}
 										/>
 										{option.label}

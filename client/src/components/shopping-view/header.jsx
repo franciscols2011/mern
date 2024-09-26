@@ -24,23 +24,32 @@ import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "/src/store/shop/cart-slice";
 import { Label } from "../ui/label";
+import { useSearchParams } from "react-router-dom";
 
 function MenuItems() {
 	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	function handleNavigate(getCurrentMenuItem) {
 		const currentFilter =
-			getCurrentMenuItem.id !== "home"
+			getCurrentMenuItem.id !== "home" && getCurrentMenuItem.id !== "products"
 				? {
 						category: [getCurrentMenuItem.id],
 				  }
-				: null;
+				: {};
 
-		sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+		const params = new URLSearchParams();
+		for (const [key, value] of Object.entries(currentFilter)) {
+			if (value.length > 0) {
+				params.set(key, value.join(","));
+			}
+		}
 
-		navigate(getCurrentMenuItem.path, { replace: true });
-		window.location.reload();
+		navigate(`${getCurrentMenuItem.path}?${params.toString()}`, {
+			replace: true,
+		});
 	}
+
 	return (
 		<nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
 			{shoppingViewHeaderMenuItems.map((menuItem) => (

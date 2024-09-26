@@ -21,20 +21,6 @@ import ProductDetailsDialog from "/src/components/shopping-view/product-details"
 import { addToCart, fetchCartItems } from "/src/store/shop/cart-slice";
 import { useToast } from "/src/hooks/use-toast";
 
-function createSearchParamsHelper(filterParams) {
-	const queryParams = [];
-
-	for (const [key, value] of Object.entries(filterParams)) {
-		if (Array.isArray(value) && value.length > 0) {
-			const paramValue = value.join(",");
-
-			queryParams.push(`${key}=${paramValue}`);
-		}
-	}
-
-	return queryParams.join("&");
-}
-
 function ShoppingListing() {
 	const dispatch = useDispatch();
 	const { productList, productDetails } = useSelector(
@@ -42,47 +28,73 @@ function ShoppingListing() {
 	);
 	const { user } = useSelector((state) => state.auth);
 	const [filters, setFilters] = useState({});
-	const [sort, setSort] = useState(null);
+	const [sort, setSort] = useState("price-lowtohigh");
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	const { toast } = useToast();
+
+	function parseSearchParamsToFilters(params) {
+		const newFilters = {};
+		for (const [key, value] of params.entries()) {
+			newFilters[key] = value.split(",");
+		}
+		return newFilters;
+	}
+
+	useEffect(() => {
+		const initialFilters = parseSearchParamsToFilters(searchParams);
+		setFilters(initialFilters);
+	}, []);
+
+	useEffect(() => {
+		const newFilters = parseSearchParamsToFilters(searchParams);
+		setFilters(newFilters);
+	}, [searchParams]);
+
+	useEffect(() => {
+		if (filters && sort) {
+			dispatch(
+				fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+			);
+		}
+	}, [dispatch, filters, sort]);
 
 	function handleSort(value) {
 		setSort(value);
 	}
 
-	function handleFilter(getSectionId, getCurrentOption) {
-		let copyFilters = { ...filters };
-		const indexOfCurrentSection =
-			Object.keys(copyFilters).indexOf(getSectionId);
+	function handleFilter(sectionId, optionId) {
+		const sectionFilters = filters[sectionId] || [];
+		const isOptionSelected = sectionFilters.includes(optionId);
+		const updatedSectionFilters = isOptionSelected
+			? sectionFilters.filter((id) => id !== optionId)
+			: [...sectionFilters, optionId];
 
-		if (indexOfCurrentSection === -1) {
-			copyFilters = {
-				...copyFilters,
-				[getSectionId]: [getCurrentOption],
-			};
-		} else {
-			const indexOfCurrentOption =
-				copyFilters[getSectionId].indexOf(getCurrentOption);
-			if (indexOfCurrentOption === -1) {
-				copyFilters[getSectionId].push(getCurrentOption);
+		const newFilters = {
+			...filters,
+			[sectionId]: updatedSectionFilters,
+		};
+
+		const params = new URLSearchParams();
+		for (const [key, value] of Object.entries(newFilters)) {
+			if (value.length > 0) {
+				params.set(key, value.join(","));
 			} else {
-				copyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+				params.delete(key);
 			}
 		}
-		setFilters(copyFilters);
-		sessionStorage.setItem("filters", JSON.stringify(copyFilters));
+		setSearchParams(params);
 	}
 
-	function handleGetProductDetails(getCurrentProductId) {
-		dispatch(fetchProductDetails(getCurrentProductId));
+	function handleGetProductDetails(productId) {
+		dispatch(fetchProductDetails(productId));
 	}
 
-	function handleAddToCart(getCurrentProductId) {
+	function handleAddToCart(productId) {
 		dispatch(
 			addToCart({
 				userId: user?.id,
-				productId: getCurrentProductId,
+				productId: productId,
 				quantity: 1,
 			})
 		).then((data) => {
@@ -94,25 +106,6 @@ function ShoppingListing() {
 			}
 		});
 	}
-
-	useEffect(() => {
-		setSort("price-lowtohigh");
-		setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
-	}, []);
-
-	useEffect(() => {
-		if (filters && Object.keys(filters).length > 0) {
-			const createQueryString = createSearchParamsHelper(filters);
-			setSearchParams(new URLSearchParams(createQueryString));
-		}
-	}, [filters]);
-
-	useEffect(() => {
-		if (filters !== null && sort !== null)
-			dispatch(
-				fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
-			);
-	}, [dispatch, sort, filters]);
 
 	useEffect(() => {
 		if (productDetails !== null) setOpenDetailsDialog(true);
@@ -129,7 +122,7 @@ function ShoppingListing() {
 						<h2 className="text-xl font-bold text-gray-800">Products</h2>
 						<div className="flex items-center gap-3">
 							<span className="text-gray-600">
-								{productList?.length} Products
+								{productList?.length || 0} Products
 							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
