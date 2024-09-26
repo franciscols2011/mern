@@ -69,9 +69,19 @@ function HeaderRightContent() {
 	const [openCartSheet, setOpenCartSheet] = useState(false);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const [searchKeyword, setSearchKeyword] = useState("");
 
 	function handleLogout() {
 		dispatch(logoutUser());
+	}
+
+	function handleSearchSubmit(e) {
+		e.preventDefault();
+		const trimmedKeyword = searchKeyword.trim();
+		if (trimmedKeyword !== "") {
+			navigate(`/shop/listing?search=${encodeURIComponent(trimmedKeyword)}`);
+			setSearchKeyword("");
+		}
 	}
 
 	useEffect(() => {
@@ -83,11 +93,18 @@ function HeaderRightContent() {
 	return (
 		<div className="flex items-center gap-4">
 			<div className="hidden md:flex">
-				<Input
-					type="text"
-					placeholder="Search products..."
-					className="w-64 bg-gray-100 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-2"
-				/>
+				<form onSubmit={handleSearchSubmit} className="hidden md:flex">
+					<Input
+						type="text"
+						placeholder="Search products..."
+						value={searchKeyword}
+						onChange={(e) => setSearchKeyword(e.target.value)}
+						className="w-64 bg-gray-100 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-2"
+					/>
+					<Button type="submit" className="ml-2">
+						Buscar
+					</Button>
+				</form>
 			</div>
 			<Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
 				<SheetTrigger asChild>

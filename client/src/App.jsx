@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -33,8 +33,6 @@ function App() {
 	}, [dispatch]);
 
 	if (isLoading) return <Skeleton className="w-[800] bg-black h-[700px]" />;
-
-	console.log(user, isLoading);
 
 	return (
 		<div className="flex flex-col overflow-hidden bg-white">
@@ -88,7 +86,6 @@ function App() {
 					<Route path="payment-success" element={<PaymentSuccessPage />} />
 				</Route>
 				<Route path="/unauth-page" element={<UnauthPage />} />
-
 				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</div>

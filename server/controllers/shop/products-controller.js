@@ -1,17 +1,27 @@
-const Product = require("../../models/product");
+const Product = require("../../models/Product");
 
 const getFilteredProducts = async (req, res) => {
 	try {
-		const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;
+		const {
+			category = "",
+			brand = "",
+			sortBy = "price-lowtohigh",
+			search = "",
+		} = req.query;
 
 		let filters = {};
 
-		if (category.length) {
+		if (category) {
 			filters.category = { $in: category.split(",") };
 		}
 
-		if (brand.length) {
+		if (brand) {
 			filters.brand = { $in: brand.split(",") };
+		}
+
+		if (search) {
+			const regEx = new RegExp(search, "i");
+			filters.title = regEx;
 		}
 
 		let sort = {};
@@ -19,21 +29,16 @@ const getFilteredProducts = async (req, res) => {
 		switch (sortBy) {
 			case "price-lowtohigh":
 				sort.price = 1;
-
 				break;
 			case "price-hightolow":
 				sort.price = -1;
-
 				break;
 			case "title-atoz":
 				sort.title = 1;
-
 				break;
 			case "title-ztoa":
 				sort.title = -1;
-
 				break;
-
 			default:
 				sort.price = 1;
 				break;

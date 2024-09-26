@@ -1,3 +1,5 @@
+// components/shopping-view/listing.jsx
+
 import { ArrowUpDownIcon } from "lucide-react";
 import {
 	DropdownMenuTrigger,
@@ -16,14 +18,15 @@ import {
 	fetchProductDetails,
 } from "/src/store/shop/products-slice";
 import ShoppingProductTile from "/src/components/shopping-view/product-tile";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import ProductDetailsDialog from "/src/components/shopping-view/product-details";
 import { addToCart, fetchCartItems } from "/src/store/shop/cart-slice";
 import { useToast } from "/src/hooks/use-toast";
-import { cn } from "/src/lib/utils"; // Utility function for conditional classNames
+import { cn } from "/src/lib/utils";
 
 function ShoppingListing() {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const { productList, productDetails } = useSelector(
 		(state) => state.shopProducts
 	);
@@ -35,11 +38,15 @@ function ShoppingListing() {
 	const location = useLocation();
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 	const { toast } = useToast();
+	const [searchTerm, setSearchTerm] = useState("");
 
 	function parseSearchParamsToFilters(params) {
 		const newFilters = {};
 		for (const [key, value] of params.entries()) {
 			if (value) {
+				if (key === "search") {
+					continue;
+				}
 				const valuesArray = value.split(",").filter((v) => v !== "");
 				if (valuesArray.length > 0) {
 					newFilters[key] = valuesArray;
@@ -53,15 +60,21 @@ function ShoppingListing() {
 		const params = new URLSearchParams(location.search);
 		const newFilters = parseSearchParamsToFilters(params);
 		setFilters(newFilters);
+		const search = params.get("search") || "";
+		setSearchTerm(search);
 	}, [location.search]);
 
 	useEffect(() => {
 		if (filters && sort) {
 			dispatch(
-				fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+				fetchAllFilteredProducts({
+					filterParams: filters,
+					sortParams: sort,
+					searchTerm,
+				})
 			);
 		}
-	}, [dispatch, filters, sort]);
+	}, [dispatch, filters, sort, searchTerm]);
 
 	useEffect(() => {
 		if (user?.id) {
@@ -89,6 +102,9 @@ function ShoppingListing() {
 		}
 
 		const params = new URLSearchParams();
+		if (searchTerm) {
+			params.set("search", searchTerm);
+		}
 		for (const [key, value] of Object.entries(newFilters)) {
 			if (value.length > 0) {
 				params.set(key, value.join(","));
@@ -138,7 +154,6 @@ function ShoppingListing() {
 
 	return (
 		<div className="flex flex-col md:flex-row gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-			{/* Filters Sidebar */}
 			<div className="w-full md:w-1/4">
 				<div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
 					<h3 className="text-2xl font-bold mb-6 text-gray-800">
@@ -147,7 +162,6 @@ function ShoppingListing() {
 					<ProductFilter filters={filters} handleFilter={handleFilter} />
 				</div>
 			</div>
-			{/* Products Section */}
 			<div className="w-full md:w-3/4">
 				<div className="bg-white rounded-lg shadow-lg">
 					<div className="p-6 border-b flex flex-col md:flex-row items-center justify-between">
@@ -191,7 +205,7 @@ function ShoppingListing() {
 						{productList && productList.length > 0 ? (
 							productList.map((productItem) => (
 								<ShoppingProductTile
-									key={productItem.id}
+									key={productItem._id}
 									handleGetProductDetails={handleGetProductDetails}
 									product={productItem}
 									handleAddToCart={handleAddToCart}
