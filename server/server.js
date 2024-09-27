@@ -1,3 +1,5 @@
+// server.js
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -10,11 +12,11 @@ const shopCartRouter = require("./routes/shop/cart-routes");
 const shopAddressRouter = require("./routes/shop/address-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
 const shopSearchRouter = require("./routes/shop/search-routes");
+const shopReviewRouter = require("./routes/shop/review-routes");
 
+// Conexión a la base de datos usando la variable de entorno
 mongoose
-	.connect(
-		"mongodb+srv://francopia5030:franlopez22@ecommerce.wocfw.mongodb.net/"
-	)
+	.connect(process.env.MONGO_URI)
 	.then(() => console.log("DB connected"))
 	.catch((error) => {
 		console.log(error);
@@ -50,8 +52,8 @@ app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
+app.use("/api/shop/review", shopReviewRouter);
 
-// Servidor
 app.get("/", (req, res) => {
 	res.send("Server running");
 });

@@ -1,4 +1,3 @@
-// src/store/auth-slice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -45,7 +44,7 @@ export const loginUser = createAsyncThunk("auth/login", async (formData) => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data; // Retorna el error directamente
+			return error.response.data;
 		} else if (error.request) {
 			return "No se recibió respuesta del servidor.";
 		} else {
@@ -66,8 +65,7 @@ export const logoutUser = createAsyncThunk("auth/logout", async () => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data; // Retorna el error directamente
-		} else if (error.request) {
+			return error.response.data;
 			return "No se recibió respuesta del servidor.";
 		} else {
 			return "Error al configurar la solicitud.";
@@ -90,7 +88,7 @@ export const checkAuth = createAsyncThunk("auth/auth/checkauth", async () => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data; // Retorna el error directamente
+			return error.response.data;
 		} else if (error.request) {
 			return "No se recibió respuesta del servidor.";
 		} else {
@@ -121,7 +119,7 @@ const authSlice = createSlice({
 					state.isAuthenticated = true;
 					state.error = null;
 				} else {
-					state.error = action.payload; // Error del servidor
+					state.error = action.payload;
 				}
 			})
 			.addCase(registerUser.rejected, (state, action) => {
@@ -141,7 +139,7 @@ const authSlice = createSlice({
 					state.isAuthenticated = true;
 					state.error = null;
 				} else {
-					state.error = action.payload; // Error del servidor
+					state.error = action.payload;
 				}
 			})
 			.addCase(loginUser.rejected, (state, action) => {
@@ -161,7 +159,7 @@ const authSlice = createSlice({
 					state.isAuthenticated = true;
 					state.error = null;
 				} else {
-					state.error = action.payload; // Error del servidor
+					state.error = action.payload;
 				}
 			})
 			.addCase(checkAuth.rejected, (state, action) => {

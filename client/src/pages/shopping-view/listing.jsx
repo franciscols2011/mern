@@ -1,5 +1,3 @@
-// components/shopping-view/listing.jsx
-
 import { ArrowUpDownIcon } from "lucide-react";
 import {
 	DropdownMenuTrigger,
