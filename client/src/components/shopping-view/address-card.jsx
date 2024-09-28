@@ -2,14 +2,17 @@ import { CardFooter } from "/components/ui/card";
 import { Label } from "../ui/label";
 import { Card, CardContent } from "/components/ui/card";
 import { Button } from "../ui/button";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, CheckCircle } from "lucide-react";
 
 function AddressCard({
 	addressInfo,
 	handleDeleteAddress,
 	handleEditAddress,
 	setCurrentSelectedAddress,
+	selectedId,
 }) {
+	const isSelected = selectedId === addressInfo._id;
+
 	return (
 		<Card
 			onClick={
@@ -17,9 +20,14 @@ function AddressCard({
 					? () => setCurrentSelectedAddress(addressInfo)
 					: null
 			}
-			className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+			className={`relative ${
+				isSelected ? "bg-gray-100 border border-gray-500" : "bg-white"
+			} rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer`}
 		>
-			<CardContent className="grid gap-3 p-4">
+			{isSelected && (
+				<CheckCircle className="absolute top-2 right-2 text-green-500" />
+			)}
+			<CardContent className={`grid gap-4 p-4`}>
 				<div>
 					<Label className="font-semibold text-gray-700">Address:</Label>
 					<p className="text-gray-600">{addressInfo?.address || "N/A"}</p>

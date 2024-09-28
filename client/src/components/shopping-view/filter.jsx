@@ -1,5 +1,3 @@
-// /src/components/shopping-view/filter.js
-
 import { Fragment } from "react";
 import { filterOptions } from "/src/config";
 import { Label } from "../ui/label";
@@ -25,8 +23,10 @@ function ProductFilter({ filters, handleFilter }) {
 										className="flex font-semibold items-center gap-2"
 									>
 										<Checkbox
-											checked={filters[keyItem]?.includes(option.id)}
-											onCheckedChange={() => handleFilter(keyItem, option.id)}
+											checked={filters[keyItem]?.includes(option.id) || false}
+											onCheckedChange={(checked) =>
+												handleFilter(keyItem, option.id, checked === true)
+											}
 										/>
 										{option.label}
 									</Label>

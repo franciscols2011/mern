@@ -47,37 +47,39 @@ function ShoppingProductTile({
 	};
 
 	return (
-		<Card className="w-full max-w-sm mx-auto bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+		<Card className="w-full max-w-sm mx-auto bg-white rounded-xl shadow-md overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
 			<div
 				onClick={() => handleGetProductDetails(product?._id)}
-				className="cursor-pointer"
+				className="cursor-pointer relative group"
 			>
 				<div className="relative">
 					<img
 						src={product?.image}
 						alt={product?.title}
-						className="w-full h-[300px] object-cover rounded-t-lg"
+						className="w-full h-80 object-cover transition-transform duration-500 transform group-hover:scale-110"
 					/>
-					<div className="absolute top-2 left-2 flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-1">
+					<div className="absolute top-4 left-4 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
 						{remainingStock <= 0 ? (
-							<Badge className="bg-gray-500 text-white">Out of Stock</Badge>
+							<Badge className="bg-red-600 text-white">Out of Stock</Badge>
 						) : (
 							<>
 								{product?.salePrice > 0 && (
-									<Badge className="bg-red-500 text-white">Sale</Badge>
+									<Badge className="bg-green-500 text-white">Sale</Badge>
 								)}
 								{remainingStock < 10 && (
-									<Badge className="bg-yellow-500 text-white">{`Only ${remainingStock} left in stock`}</Badge>
+									<Badge className="bg-yellow-500 text-white">
+										Only {remainingStock} left
+									</Badge>
 								)}
 							</>
 						)}
 					</div>
 				</div>
-				<CardContent className="p-4">
-					<h2 className="text-xl font-bold mb-2 text-gray-800">
+				<CardContent className="p-6">
+					<h2 className="text-2xl font-semibold text-gray-800 mb-2">
 						{product?.title}
 					</h2>
-					<div className="flex justify-between items-center mb-2">
+					<div className="flex justify-between items-center mb-4">
 						<span className="text-sm text-gray-600">
 							{categoryOptionsMap[product?.category]}
 						</span>
@@ -85,32 +87,32 @@ function ShoppingProductTile({
 							{brandOptionsMap[product?.brand]}
 						</span>
 					</div>
-					<div className="flex justify-between items-center">
+					<div className="flex items-baseline space-x-2">
 						<span
 							className={`${
 								product?.salePrice > 0
 									? "line-through text-gray-500"
-									: "text-lg font-semibold text-primary"
+									: "text-lg font-semibold text-blue-600"
 							}`}
 						>
 							${product?.price}
 						</span>
 						{product?.salePrice > 0 && (
-							<span className="text-lg font-semibold text-primary">
+							<span className="text-lg font-bold text-red-600">
 								${product?.salePrice}
 							</span>
 						)}
 					</div>
 				</CardContent>
 			</div>
-			<CardFooter className="p-4 bg-gray-50 rounded-b-lg">
+			<CardFooter className="p-4 bg-gray-50">
 				<Button
 					onClick={handleAdd}
 					className={`w-full ${
 						isDisabled
 							? "bg-gray-400 cursor-not-allowed"
-							: "bg-gray-800 hover:bg-gray-700"
-					} text-white flex items-center justify-center`}
+							: "bg-blue-600 hover:bg-blue-500"
+					} text-white flex items-center justify-center rounded-md transition-colors duration-300`}
 					disabled={isDisabled}
 				>
 					<ShoppingCart className="w-5 h-5 mr-2" />

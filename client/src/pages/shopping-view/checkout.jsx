@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createNewOrder } from "/src/store/shop/order-slice";
 import { useToast } from "/src/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 function ShoppingCheckout() {
 	const { cartItems } = useSelector((state) => state.shopCart);
@@ -33,7 +34,7 @@ function ShoppingCheckout() {
 	function handleInitialPaypalPayment() {
 		if (isPaymentStart) return;
 
-		if (cartItems.length === 0) {
+		if (!cartItems || cartItems.items.length === 0) {
 			toast({
 				title: "Your cart is empty",
 				variant: "destructive",
@@ -84,16 +85,18 @@ function ShoppingCheckout() {
 
 		dispatch(createNewOrder(orderData)).then((data) => {
 			if (data?.payload?.success) {
-				setIsPaymentStart(true);
+				setIsPaymentStart(false);
 			} else {
 				setIsPaymentStart(false);
 			}
 		});
 	}
 
-	if (approvalURL) {
-		window.location.href = approvalURL;
-	}
+	useEffect(() => {
+		if (approvalURL) {
+			window.location.href = approvalURL;
+		}
+	}, [approvalURL]);
 
 	return (
 		<div className="flex flex-col min-h-screen">
@@ -106,7 +109,10 @@ function ShoppingCheckout() {
 			</div>
 			<div className="container mx-auto px-4 py-8">
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-					<Address setCurrentSelectedAddress={setCurrentSelectedAddress} />
+					<Address
+						selectedId={currentSelectedAddress?._id}
+						setCurrentSelectedAddress={setCurrentSelectedAddress}
+					/>
 					<div className="flex flex-col gap-6">
 						{cartItems && cartItems.items && cartItems.items.length > 0 ? (
 							cartItems.items.map((item) => (
@@ -155,7 +161,9 @@ function ShoppingCheckout() {
 								{isPaymentStart ? (
 									<Loader2 className="w-5 h-5 mr-2 animate-spin" />
 								) : null}
-								Checkout with PayPal
+								{isPaymentStart
+									? "Checking Payment..."
+									: "Checkout with PayPal"}
 							</Button>
 						</div>
 					</div>

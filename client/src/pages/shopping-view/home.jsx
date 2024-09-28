@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "/src/components/ui/button";
-import bannerOne from "/src/assets/banner-1.webp";
-import bannerTwo from "/src/assets/banner-2.webp";
-import bannerThree from "/src/assets/banner-3.webp";
+import bannerOne from "/src/assets/banner-1.jpeg";
+import bannerTwo from "/src/assets/banner-2.png";
+import bannerThree from "/src/assets/banner-3.jpg";
 import {
 	Airplay,
 	BabyIcon,
@@ -249,12 +249,12 @@ function ShoppingHome() {
 			</section>
 
 			{/* Featured Products Section */}
-			<section className="py-12 bg-gray-50">
+			<section className="py-16 bg-gray-100">
 				<div className="container mx-auto px-4">
-					<h2 className="text-4xl font-bold text-center text-gray-800 mb-12">
+					<h2 className="text-5xl font-extrabold text-center text-gray-900 mb-16">
 						Featured Products
 					</h2>
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 ">
 						{productList && productList.length > 0 ? (
 							productList
 								.slice(0, 8)

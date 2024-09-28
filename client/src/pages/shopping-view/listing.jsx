@@ -84,12 +84,20 @@ function ShoppingListing() {
 		setSort(value);
 	}
 
-	function handleFilter(sectionId, optionId) {
+	function handleFilter(sectionId, optionId, checked) {
+		const isChecked = checked === true;
 		const sectionFilters = filters[sectionId] || [];
-		const isOptionSelected = sectionFilters.includes(optionId);
-		const updatedSectionFilters = isOptionSelected
-			? sectionFilters.filter((id) => id !== optionId)
-			: [...sectionFilters, optionId];
+		let updatedSectionFilters;
+
+		if (isChecked) {
+			if (!sectionFilters.includes(optionId)) {
+				updatedSectionFilters = [...sectionFilters, optionId];
+			} else {
+				updatedSectionFilters = sectionFilters;
+			}
+		} else {
+			updatedSectionFilters = sectionFilters.filter((id) => id !== optionId);
+		}
 
 		const newFilters = { ...filters };
 
@@ -109,8 +117,6 @@ function ShoppingListing() {
 			}
 		}
 		setSearchParams(params);
-
-		setFilters(newFilters);
 	}
 
 	function handleGetProductDetails(productId) {
@@ -152,22 +158,20 @@ function ShoppingListing() {
 
 	return (
 		<div className="flex flex-col md:flex-row gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-			<div className="w-full md:w-1/4">
-				<div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-					<h3 className="text-2xl font-bold mb-6 text-gray-800">
+			<div className="w-full md:w-1/5 lg:w-1/6">
+				<div className="bg-white rounded-lg shadow-lg p-4 sticky top-24">
+					<h3 className="text-xl font-semibold mb-4 text-gray-800">
 						Filter Products
 					</h3>
 					<ProductFilter filters={filters} handleFilter={handleFilter} />
 				</div>
 			</div>
-			<div className="w-full md:w-3/4">
+			<div className="w-full md:w-4/5 lg:w-5/6">
 				<div className="bg-white rounded-lg shadow-lg">
-					<div className="p-6 border-b flex flex-col md:flex-row items-center justify-between">
-						<h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-							Products
-						</h2>
+					<div className="p-6 border-b flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
+						<h2 className="text-2xl font-bold text-gray-800">Products</h2>
 						<div className="flex items-center gap-3">
-							<span className="text-gray-600 text-lg">
+							<span className="text-gray-600 text-md">
 								{productList?.length || 0} Products
 							</span>
 							<DropdownMenu>
@@ -199,7 +203,7 @@ function ShoppingListing() {
 							</DropdownMenu>
 						</div>
 					</div>
-					<div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+					<div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 						{productList && productList.length > 0 ? (
 							productList.map((productItem) => (
 								<ShoppingProductTile

@@ -180,33 +180,35 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 
 	return (
 		<Dialog open={open} onOpenChange={handleDialogClose}>
-			<DialogContent className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
-				<div className="relative overflow-hidden rounded-lg shadow-lg">
+			<DialogContent className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw] bg-white rounded-xl shadow-lg overflow-hidden">
+				<div className="relative overflow-hidden rounded-lg shadow-md transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl group">
 					<img
 						src={productDetails?.image}
 						alt={productDetails?.title}
 						width={600}
 						height={600}
-						className="aspect-square w-full object-cover rounded-lg"
+						className="aspect-square w-full object-cover transition-transform duration-500 transform group-hover:scale-110"
 					/>
-					<div className="absolute top-2 left-2 flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-1">
+					<div className="absolute top-4 left-4 flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-2">
 						{remainingStock <= 0 ? (
-							<Badge className="bg-gray-500 text-white">Out of Stock</Badge>
+							<Badge className="bg-red-600 text-white">Out of Stock</Badge>
 						) : (
 							<>
 								{productDetails?.salePrice > 0 && (
-									<Badge className="bg-red-500 text-white">Sale</Badge>
+									<Badge className="bg-green-500 text-white">Sale</Badge>
 								)}
 								{remainingStock < 10 && (
 									<Badge className="bg-yellow-500 text-white">
-										{`Only ${remainingStock} left in stock`}
+										Only {remainingStock} left in stock
 									</Badge>
 								)}
 							</>
 						)}
 					</div>
 				</div>
-				<div className="grid gap-6">
+
+				{/* Información del Producto */}
+				<div className="flex flex-col justify-between">
 					<div>
 						<h1 className="text-3xl font-extrabold text-gray-800">
 							{productDetails?.title}
@@ -214,8 +216,31 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 						<p className="text-gray-600 text-lg mb-5 mt-4">
 							{productDetails?.description}
 						</p>
+						<div className="flex items-center gap-2">
+							<div className="flex items-center gap-0.5">
+								{starFill.map((fill, index) => {
+									if (fill === "full") {
+										return (
+											<StarIcon
+												key={index}
+												className="w-5 h-5 fill-yellow-400"
+											/>
+										);
+									} else if (fill === "half") {
+										return <HalfStar key={index} />;
+									} else {
+										return (
+											<StarIcon key={index} className="w-5 h-5 text-blue-300" />
+										);
+									}
+								})}
+							</div>
+							<span className="text-gray-500">({averageRating})</span>
+						</div>
 					</div>
-					<div className="flex items-center justify-between">
+
+					{/* Precios */}
+					<div className="flex items-center justify-between mt-4">
 						<p
 							className={`text-3xl font-bold ${
 								productDetails?.salePrice > 0
@@ -231,39 +256,26 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 							</p>
 						)}
 					</div>
-					<div className="flex items-center gap-2 mt-2">
-						<div className="flex items-center gap-0.5">
-							{starFill.map((fill, index) => {
-								if (fill === "full") {
-									return (
-										<StarIcon key={index} className="w-5 h-5 fill-yellow-400" />
-									);
-								} else if (fill === "half") {
-									return <HalfStar key={index} />;
-								} else {
-									return (
-										<StarIcon key={index} className="w-5 h-5 text-blue-300" />
-									);
-								}
-							})}
-						</div>
-						<span className="text-gray-500">({averageRating})</span>
-					</div>
+
+					{/* Botón de Añadir al Carrito */}
 					<div className="mt-5 mb-5">
 						<Button
 							onClick={() => handleAddToCart(productDetails?._id)}
 							className={`w-full ${
 								isDisabled
 									? "bg-gray-400 cursor-not-allowed"
-									: "bg-gray-800 hover:bg-gray-700"
-							} text-white flex items-center justify-center rounded-lg shadow-md transition-colors`}
+									: "bg-blue-600 hover:bg-blue-500"
+							} text-white flex items-center justify-center rounded-lg shadow-md transition-colors duration-300`}
 							disabled={isDisabled}
 						>
 							<ShoppingCart className="w-5 h-5 mr-2" />
 							{isDisabled ? "Out of Stock" : "Add to Cart"}
 						</Button>
 					</div>
+
 					<Separator className="bg-gray-200" />
+
+					{/* Sección de Reseñas */}
 					<div className="max-h-[300px] overflow-auto">
 						<h2 className="text-xl font-bold mb-4 text-gray-800">Reviews</h2>
 						<div className="space-y-6">
