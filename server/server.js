@@ -14,6 +14,8 @@ const shopOrderRouter = require("./routes/shop/order-routes");
 const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 
+const commonFeatureRouter = require("./routes/common/feature-routes");
+
 // Conexión a la base de datos usando la variable de entorno
 mongoose
 	.connect(process.env.MONGO_URI)
@@ -53,6 +55,7 @@ app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
+app.use("/api/common/feature", commonFeatureRouter);
 
 app.get("/", (req, res) => {
 	res.send("Server running");

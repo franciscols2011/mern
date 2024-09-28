@@ -22,7 +22,7 @@ export const registerUser = createAsyncThunk(
 			return response.data;
 		} catch (error) {
 			if (error.response) {
-				return error.response.data; // Retorna el error directamente
+				return error.response.data;
 			} else if (error.request) {
 				return "No se recibió respuesta del servidor.";
 			} else {
@@ -66,6 +66,7 @@ export const logoutUser = createAsyncThunk("auth/logout", async () => {
 	} catch (error) {
 		if (error.response) {
 			return error.response.data;
+		} else if (error.request) {
 			return "No se recibió respuesta del servidor.";
 		} else {
 			return "Error al configurar la solicitud.";
