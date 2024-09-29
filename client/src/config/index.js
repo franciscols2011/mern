@@ -14,9 +14,23 @@ export const registerFormControls = [
 		type: "email",
 	},
 	{
+		name: "confirmEmail",
+		label: "Confirm Email",
+		placeholder: "Confirm your email",
+		componentType: "input",
+		type: "email",
+	},
+	{
 		name: "password",
 		label: "Password",
 		placeholder: "Enter your password",
+		componentType: "input",
+		type: "password",
+	},
+	{
+		name: "confirmPassword",
+		label: "Confirm Password",
+		placeholder: "Confirm your password",
 		componentType: "input",
 		type: "password",
 	},
@@ -24,11 +38,11 @@ export const registerFormControls = [
 
 export const loginFormControls = [
 	{
-		name: "email",
-		label: "Email",
-		placeholder: "Enter your email",
+		name: "identifier",
+		label: "Username",
+		placeholder: "Enter your email or username ",
 		componentType: "input",
-		type: "email",
+		type: "text",
 	},
 	{
 		name: "password",

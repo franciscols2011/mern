@@ -1,4 +1,3 @@
-// src/pages/admin-view/AdminDashboard.jsx
 import { Button } from "/src/components/ui/button";
 import ProductImageUpload from "/src/components/admin-view/image-upload";
 import { useEffect, useState } from "react";
