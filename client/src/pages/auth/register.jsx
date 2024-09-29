@@ -24,20 +24,23 @@ function AuthRegister() {
 	function onSubmit(event) {
 		event.preventDefault();
 
-		dispatch(registerUser(formData)).then((data) => {
-			if (data?.payload?.success) {
+		dispatch(registerUser(formData))
+			.unwrap()
+			.then((data) => {
+				if (data.success) {
+					toast({
+						title: "User registered successfully!",
+						variant: "success",
+					});
+					navigate("/auth/login");
+				}
+			})
+			.catch((error) => {
 				toast({
-					title: data?.payload?.message,
-					variant: "success",
-				});
-				navigate("/auth/login");
-			} else {
-				toast({
-					title: data?.payload?.message,
+					title: error || "An error occurred during registration.",
 					variant: "destructive",
 				});
-			}
-		});
+			});
 	}
 
 	return (

@@ -21,6 +21,7 @@ import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
+import { Navigate } from "react-router-dom";
 
 function App() {
 	const { user, isAuthenticated, isLoading } = useSelector(
@@ -43,7 +44,10 @@ function App() {
 						<CheckAuth
 							isAuthenticated={isAuthenticated}
 							user={user}
-						></CheckAuth>
+							isLoading={isLoading}
+						>
+							<Navigate to={isAuthenticated ? "/shop/home" : "/auth/login"} />
+						</CheckAuth>
 					}
 				/>
 				<Route

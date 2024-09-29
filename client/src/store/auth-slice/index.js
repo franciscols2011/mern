@@ -22,11 +22,11 @@ export const registerUser = createAsyncThunk(
 			return response.data;
 		} catch (error) {
 			if (error.response) {
-				return error.response.data;
+				throw new Error(error.response.data.message || "Registration failed.");
 			} else if (error.request) {
-				return "No se recibió respuesta del servidor.";
+				throw new Error("No response received from the server.");
 			} else {
-				return "Error al configurar la solicitud.";
+				throw new Error("Error setting up the request.");
 			}
 		}
 	}
@@ -47,11 +47,11 @@ export const loginUser = createAsyncThunk("auth/login", async (formData) => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data;
+			throw new Error(error.response.data.message || "Login failed.");
 		} else if (error.request) {
-			return "No se recibió respuesta del servidor.";
+			throw new Error("No response received from the server.");
 		} else {
-			return "Error al configurar la solicitud.";
+			throw new Error("Error setting up the request.");
 		}
 	}
 });
@@ -68,11 +68,11 @@ export const logoutUser = createAsyncThunk("auth/logout", async () => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data;
+			throw new Error(error.response.data.message || "Logout failed.");
 		} else if (error.request) {
-			return "No se recibió respuesta del servidor.";
+			throw new Error("No response received from the server.");
 		} else {
-			return "Error al configurar la solicitud.";
+			throw new Error("Error setting up the request.");
 		}
 	}
 });
@@ -92,11 +92,11 @@ export const checkAuth = createAsyncThunk("auth/auth/checkauth", async () => {
 		return response.data;
 	} catch (error) {
 		if (error.response) {
-			return error.response.data;
+			throw new Error(error.response.data.message || "Authentication failed.");
 		} else if (error.request) {
-			return "No se recibió respuesta del servidor.";
+			throw new Error("No response received from the server.");
 		} else {
-			return "Error al configurar la solicitud.";
+			throw new Error("Error setting up the request.");
 		}
 	}
 });
@@ -116,21 +116,13 @@ const authSlice = createSlice({
 				state.isLoading = true;
 				state.error = null;
 			})
-			.addCase(registerUser.fulfilled, (state, action) => {
+			.addCase(registerUser.fulfilled, (state) => {
 				state.isLoading = false;
-				if (action.payload.success) {
-					state.user = action.payload.user;
-					state.isAuthenticated = true;
-					state.error = null;
-				} else {
-					state.error = action.payload;
-				}
+				state.error = null;
 			})
 			.addCase(registerUser.rejected, (state, action) => {
 				state.isLoading = false;
-				state.user = null;
-				state.isAuthenticated = false;
-				state.error = action.error.message || "Error al registrar usuario";
+				state.error = action.error.message || "Error registering user";
 			})
 			.addCase(loginUser.pending, (state) => {
 				state.isLoading = true;
@@ -150,7 +142,7 @@ const authSlice = createSlice({
 				state.isLoading = false;
 				state.user = null;
 				state.isAuthenticated = false;
-				state.error = action.error.message || "Error al iniciar sesión";
+				state.error = action.error.message || "Error logging in";
 			})
 			.addCase(checkAuth.pending, (state) => {
 				state.isLoading = true;
@@ -170,8 +162,7 @@ const authSlice = createSlice({
 				state.isLoading = false;
 				state.user = null;
 				state.isAuthenticated = false;
-				state.error =
-					action.error.message || "Error al verificar autenticación";
+				state.error = action.error.message || "Error verifying authentication.";
 			})
 			.addCase(logoutUser.fulfilled, (state) => {
 				state.isLoading = false;
